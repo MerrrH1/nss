@@ -1,0 +1,39 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('sales_deliveries', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('sales_contract_id')->nullable()->constrained('sales_contracts')->onDelete('set null');
+            $table->foreignId('buyer_id')->constrained('buyers')->onDelete('cascade');
+            $table->foreignId('truck_id')->nullable()->constrained('trucks')->onDelete('set null');
+            $table->string('delivery_number')->unique();
+            $table->date('delivery_date');
+            $table->decimal('gross_weight_kg', 10, 2);
+            $table->decimal('tare_weight_kg', 10, 2);
+            $table->decimal('net_weight_kg', 10, 2);
+            $table->decimal('price_per_kg', 10, 2)->nullable();
+            $table->decimal('total_amount', 12, 2);
+            $table->text('notes')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('sales_delivers');
+    }
+};
