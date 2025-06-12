@@ -15,11 +15,14 @@ class SalesTaxInvoice extends Model
         'tax_invoice_date',
         'dpp_amount',
         'ppn_amount',
+        'payment_status',
+        'payment_date',
         'notes'
     ];
 
     protected $casts = [
-        'tax_invoice_date' => 'date'
+        'tax_invoice_date' => 'date',
+        'payment_date' => 'date'
     ];
 
     public function salesInvoice() {

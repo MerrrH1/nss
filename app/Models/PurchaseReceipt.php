@@ -17,10 +17,32 @@ class PurchaseReceipt extends Model
         'gross_weight_kg',
         'tare_weight_kg',
         'net_weight_kg',
-        'quality_deduction_percentage',
+        'final_gross_weight_kg',
+        'final_tare_weight_kg',
         'final_net_weight_kg',
+        'kk_percentage',
+        'ka_percentage',
+        'ffa_percentage',
         'price_per_kg',
+        'claim_amount',
         'total_amount',
+        'claim_notes',
         'notes'
     ];
+
+    protected $casts = [
+        'receipt_date' => 'date'
+    ];
+
+    public function purchaseContract() {
+        return $this->belongsTo(PurchaseContract::class);
+    }
+
+    public function truck() {
+        return $this->belongsTo(Truck::class);
+    }
+
+    public function purchaseInvoices() {
+        return $this->hasMany(PurchaseInvoice::class);
+    }
 }

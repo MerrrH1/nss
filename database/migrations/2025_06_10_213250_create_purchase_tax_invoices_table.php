@@ -14,11 +14,12 @@ return new class extends Migration
         Schema::create('purchase_tax_invoices', function (Blueprint $table) {
             $table->id();
             $table->foreignId('purchase_invoice_id')->nullable()->constrained('purchase_invoices')->onDelete('set null');
-            $table->foreignId('supplier_id')->constrained('suppliers')->onDelete('cascade');
             $table->string('tax_invoice_number')->unique();
             $table->date('tax_invoice_date');
             $table->decimal('dpp_amount', 12, 2);
             $table->decimal('ppn_amount', 12, 2);
+            $table->enum('payment_status', ['pending', 'paid', 'partially_paid', 'overdue'])->default('pending');
+            $table->date('payment_date')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
             $table->softDeletes();

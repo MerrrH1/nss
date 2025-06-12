@@ -11,7 +11,7 @@ class PurchaseInvoice extends Model
 
     protected $fillable = [
         'invoice_number',
-        'contract_number',
+        'purchase_contract_id',
         'invoice_date',
         'due_date',
         'sub_total',

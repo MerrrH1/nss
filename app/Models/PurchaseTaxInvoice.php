@@ -10,20 +10,18 @@ class PurchaseTaxInvoice extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'invoice_number',
-        'invoice_date',
-        'due_date',
-        'sub_total',
-        'tax_amount',
-        'total_amount',
+        'purchase_invoice_id',
+        'tax_invoice_number',
+        'tax_invoice_date',
+        'dpp_amount',
+        'ppn_amount',
         'payment_status',
         'payment_date',
         'notes'
     ];
 
     protected $casts = [
-        'invoice_date' => 'date',
-        'due_date' => 'date',
+        'tax_invoice_date' => 'date',
         'payment_date' => 'date'
     ];
 
