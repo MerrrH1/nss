@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Supplier;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class SupplierController extends Controller
 {
@@ -12,7 +15,8 @@ class SupplierController extends Controller
      */
     public function index()
     {
-        //
+        $suppliers = Supplier::orderBy('name')->paginate(10);
+        return view('suppliers.index', compact('suppliers'));
     }
 
     /**
@@ -20,7 +24,7 @@ class SupplierController extends Controller
      */
     public function create()
     {
-        //
+        return view('suppliers.create');
     }
 
     /**
@@ -28,7 +32,22 @@ class SupplierController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255|unique:suppliers,name',
+            'address' => 'nullable|string|max:500',
+            'phone' => 'nullable|string|max:20',
+            'contact_person' => 'nullable|string|max:255',
+            'email' => 'nullable|string|max:255|unique:suppliers,email',
+            'npwp' => 'nullable|string|max:20|unique:suppliers,npwp',
+        ]);
+
+        try {
+            Supplier::create($request->all());
+            return redirect()->route('suppliers.index')->with('success', 'Penjual berhasil ditambahkan!');
+        } catch (Exception $e) {
+            Log::error("Gagal menambahkan penjual: {$e->getMessage()}", ['exception' => $e]);
+            return back()->withInput()->with('error', 'Terjadi kesalahan saat menambahkan penjual!');
+        }
     }
 
     /**
@@ -36,7 +55,7 @@ class SupplierController extends Controller
      */
     public function show(Supplier $supplier)
     {
-        //
+        return view('suppliers.show', compact('supplier'));
     }
 
     /**
@@ -44,7 +63,7 @@ class SupplierController extends Controller
      */
     public function edit(Supplier $supplier)
     {
-        //
+        return view('suppliers.edit', compact('supplier'));
     }
 
     /**
@@ -52,7 +71,22 @@ class SupplierController extends Controller
      */
     public function update(Request $request, Supplier $supplier)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255' . Rule::unique('suppliers')->ignore($supplier->id()),
+            'address' => 'nullable|string|max:500',
+            'phone' => 'nullable|string|max:20',
+            'contact_person' => 'nullable|string|max:255',
+            'email' => 'nullable|string|max:255|unique:suppliers,email',
+            'npwp' => 'nullable|string|max:20' . Rule::unique('suppliers')->ignore($supplier->id()),
+        ]);
+
+        try {
+            Supplier::update($request->all());
+            return redirect()->route('suppliers.index')->with('success', 'Penjual berhasil diperbarui!');
+        } catch (Exception $e) {
+            Log::error("Gagal memperbarui penjual: {$e->getMessage()}", ['exception' => $e]);
+            return back()->withInput()->with('error', 'Terjadi kesalahan saat memperbarui penjual!');
+        }
     }
 
     /**

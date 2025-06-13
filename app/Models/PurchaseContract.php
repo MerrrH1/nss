@@ -15,6 +15,7 @@ class PurchaseContract extends Model
         'contract_date',
         'start_date',
         'end_date',
+        'commodity_id',
         'total_quantity_kg',
         'price_per_kg',
         'tolerated_kk_percentage',
@@ -33,6 +34,10 @@ class PurchaseContract extends Model
 
     public function supplier() {
         return $this->belongsTo(Supplier::class);
+    }
+
+    public function commodity() {
+        return $this->belongsTo(Commodity::class);
     }
 
     public function purchaseReceipts() {

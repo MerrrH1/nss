@@ -15,6 +15,7 @@ class SalesContract extends Model
         'contract_date',
         'start_date',
         'end_date',
+        'commodity_id',
         'total_quantity_kg',
         'price_per_kg',
         'tolerated_kk_percentage',
@@ -33,6 +34,10 @@ class SalesContract extends Model
 
     public function buyer() {
         return $this->belongsTo(Buyer::class);
+    }
+
+    public function commodity() {
+        return $this->belongsTo(Commodity::class);
     }
 
     public function salesDeliveries() {
