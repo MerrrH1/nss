@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('sales_deliveries', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('sales_contract_id')->nullable()->constrained('sales_contracts')->onDelete('set null');
-            $table->foreignId('truck_id')->nullable()->constrained('trucks')->onDelete('set null');
+            $table->foreignId('sales_contract_id')->constrained('sales_contracts')->onDelete('cascade');
+            $table->foreignId('truck_id')->constrained('trucks')->onDelete('cascade');
             $table->string('delivery_number')->unique();
             $table->date('delivery_date');
             $table->decimal('gross_weight_kg', 10, 2);

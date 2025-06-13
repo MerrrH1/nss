@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('purchase_receipts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('purchase_contract_id')->nullable()->constrained('purchase_contracts')->onDelete('set null');
-            $table->foreignId('truck_id')->nullable()->constrained('trucks')->onDelete('set null');
+            $table->foreignId('purchase_contract_id')->constrained('purchase_contracts')->onDelete('cascade');
+            $table->foreignId('truck_id')->constrained('trucks')->onDelete('cascade');
             $table->string('receipt_number')->unique();
             $table->date('receipt_date');
             $table->decimal('gross_weight_kg', 10, 2);

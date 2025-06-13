@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('purchase_tax_invoices', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('purchase_invoice_id')->nullable()->constrained('purchase_invoices')->onDelete('set null');
+            $table->foreignId('purchase_invoice_id')->constrained('purchase_invoices')->onDelete('cascade');
             $table->string('tax_invoice_number')->unique();
             $table->date('tax_invoice_date');
             $table->decimal('dpp_amount', 12, 2);
