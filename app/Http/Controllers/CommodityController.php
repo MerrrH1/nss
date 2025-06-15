@@ -68,7 +68,7 @@ class CommodityController extends Controller
     public function update(Request $request, Commodity $commodity)
     {
         $request->validate([
-            'name' => 'required|string|max:255' . Rule::unique('commodities')->ignore($commodity->id()),,
+            'name' => 'required|string|max:255|' . Rule::unique('commodities')->ignore($commodity->id()),,
             'description' => 'nullable|string|max:500'
         ]);
 

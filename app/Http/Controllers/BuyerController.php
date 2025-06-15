@@ -72,7 +72,7 @@ class BuyerController extends Controller
     public function update(Request $request, Buyer $buyer)
     {
         $request->validate([
-            'name' => 'required|string|max:255' . Rule::unique('buyers')->ignore($buyer->id()),
+            'name' => 'required|string|max:255|' . Rule::unique('buyers')->ignore($buyer->id()),
             'address' => 'nullable|string|max:500',
             'phone' => 'nullable|string|max:20',
             'contact_person' => 'nullable|string|max:255',

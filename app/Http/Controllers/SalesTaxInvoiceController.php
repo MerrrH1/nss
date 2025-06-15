@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\SalesTaxInvoice;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class SalesTaxInvoiceController extends Controller
 {
@@ -12,7 +14,8 @@ class SalesTaxInvoiceController extends Controller
      */
     public function index()
     {
-        //
+        $salesTaxInvoices = SalesTaxInvoice::orderBy('created_at')->paginate(10);
+        return view('sales_tax_invoices.index', compact('salesTaxInvoices'));
     }
 
     /**
@@ -20,7 +23,7 @@ class SalesTaxInvoiceController extends Controller
      */
     public function create()
     {
-        //
+        return view('sales_tax_invoices.create');
     }
 
     /**
@@ -28,7 +31,24 @@ class SalesTaxInvoiceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'sales_invoice_id' => 'required|integer',
+            'tax_invoice_number' => 'required|string|max:2',
+            'tax_invoice_date' => 'required|date',
+            'dpp_amount' => 'required|decimal',
+            'ppn_amount' => 'required|decimal',
+            'payment_status' => 'required|enum:paid,unpaid',
+            'payment_date' => 'nullable|date',
+            'notes' => 'nullable|string'
+        ]);
+
+        try {
+            SalesTaxInvoice::create($request->all());
+            return redirect()->route('sales_tax_invoices.index')->with('success', 'Faktur pajak penjualan berhasil ditambahkan!');
+        } catch (Exception $e) {
+            Log::error("Gagal menambahkan faktur pajak penjualan: {$e->getMessage()}", ['exception' => $e]);
+            return back()->withInput()->with('error', 'Terjadi kesalahan saat menambahkan faktur pajak penjualan!');
+        }
     }
 
     /**
@@ -36,7 +56,7 @@ class SalesTaxInvoiceController extends Controller
      */
     public function show(SalesTaxInvoice $salesTaxInvoice)
     {
-        //
+        return view('sales_tax_invoices.show', compact('salesTaxInvoice'));
     }
 
     /**
@@ -44,7 +64,7 @@ class SalesTaxInvoiceController extends Controller
      */
     public function edit(SalesTaxInvoice $salesTaxInvoice)
     {
-        //
+        return view('sales_tax_invoices.edit', compact('salesTaxInvoice'));
     }
 
     /**
@@ -52,7 +72,24 @@ class SalesTaxInvoiceController extends Controller
      */
     public function update(Request $request, SalesTaxInvoice $salesTaxInvoice)
     {
-        //
+        $request->validate([
+            'sales_invoice_id' => 'required|integer',
+            'tax_invoice_number' => 'required|string|max:2',
+            'tax_invoice_date' => 'required|date',
+            'dpp_amount' => 'required|decimal',
+            'ppn_amount' => 'required|decimal',
+            'payment_status' => 'required|enum:paid,unpaid',
+            'payment_date' => 'nullable|date',
+            'notes' => 'nullable|string'
+        ]);
+
+        try {
+            SalesTaxInvoice::update($request->all());
+            return redirect()->route('sales_tax_invoices.index')->with('success', 'Faktur pajak penjualan berhasil diperbarui!');
+        } catch (Exception $e) {
+            Log::error("Gagal memperbarui faktur pajak penjualan: {$e->getMessage()}", ['exception' => $e]);
+            return back()->withInput()->with('error', 'Terjadi kesalahan saat memperbarui faktur pajak penjualan!');
+        }
     }
 
     /**
@@ -60,6 +97,12 @@ class SalesTaxInvoiceController extends Controller
      */
     public function destroy(SalesTaxInvoice $salesTaxInvoice)
     {
-        //
+        try {
+            $salesTaxInvoice->delete();
+            return redirect()->route('sales_tax_invoices.index')->with('success', 'Faktur pajak penjualan berhasil dihapus!');
+        } catch (\Illuminate\Database\QueryException $e) {
+            Log::error("Gagal menghapus faktur pajak penjualan: {$e->getMessage()}", ['exception' => $e]);
+            return redirect()->route('sales_tax_invoices.index')->with('error', 'Terjadi kesalahan saat menghapus faktur pajak penjualan!');
+        }
     }
 }

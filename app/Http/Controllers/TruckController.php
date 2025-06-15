@@ -6,6 +6,7 @@ use App\Models\Truck;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class TruckController extends Controller
 {
@@ -69,7 +70,7 @@ class TruckController extends Controller
     {
         $request->validate([
             'driver_name' => 'required|string|max:255',
-            'plate_number' => 'required|string|max:20|unique:trucks,plate_number',
+            'plate_number' => 'required|string|max:20|' . Rule::unique('trucks')->ignore($truck->id()),
             'capacity_kg' => 'required|integer|min:1'
         ]);
 
