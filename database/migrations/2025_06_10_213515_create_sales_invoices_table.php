@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('sales_invoices', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('sales_contract_id')->constrained('sales_contracts')->onDelete('casscade');
+            $table->foreignId('sales_contract_id')->constrained('sales_contracts')->onDelete('cascade');
             $table->string('invoice_number')->unique();
             $table->date('invoice_date');
             $table->date('due_date')->nullable();

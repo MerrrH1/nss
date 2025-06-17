@@ -1,12 +1,12 @@
 <?php
 
-use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\BuyerController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SalesContractController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -14,6 +14,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::get('/customers', [CustomerController::class, 'index'])->name('customer.index');
+Route::middleware('auth')->group(function () {
+Route::get('/buyers', [BuyerController::class, 'index'])->name('buyers.index');
+Route::resource('/sales_contracts', SalesContractController::class);
+});
 
 require __DIR__ . '/auth.php';

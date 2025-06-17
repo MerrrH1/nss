@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -46,5 +47,37 @@ class SalesContract extends Model
 
     public function salesInvoices() {
         return $this->hasMany(SalesInvoice::class);
+    }
+
+    protected function formattedBuyerName() {
+        return Attribute::make(function(string $value, array $attributes) {
+            $this->formatCompanyName($attributes['name']);
+        });
+    }
+
+    protected function formatCompanyName(string $fullName) {
+        $cleanName = trim(preg_replace('/\s+/', ' ', $fullName));
+        $upperCleanName = strtoupper($cleanName);
+        if (str_starts_with($upperCleanName, 'PT. ')) {
+            $baseName = trim(substr($cleanName, 4)); // Ambil sisa nama setelah 'PT. '
+            return 'PT. ' . $this->getInitials($baseName);
+        } elseif (str_starts_with($upperCleanName, 'CV. ')) {
+            $baseName = trim(substr($cleanName, 4)); // Ambil sisa nama setelah 'CV. '
+            return 'CV. ' . $this->getInitials($baseName);
+        }
+    }
+
+    private function getInitials(string $text) {
+        $stopWords = ['DAN', 'AND', 'OR', 'DI', 'DARI', 'KE', 'PADA', 'UNTUK', 'DENGAN', 'ATAS', 'BAWAH', 'RAYA', 'UTAMA', 'SENTOSA', 'JAYA', 'PERKASA', 'MAKMUR', 'SEJAHTERA'];
+        $words = explode(' ', strtoupper($text)); // Pecah teks menjadi kata-kata, ubah ke uppercase
+
+        $initials = '';
+        foreach ($words as $word) {
+            $word = trim($word);
+            if (!empty($word) && !in_array($word, $stopWords)) {
+                $initials .= substr($word, 0, 1);
+            }
+        }
+        return $initials;
     }
 }

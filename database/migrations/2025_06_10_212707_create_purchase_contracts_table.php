@@ -18,7 +18,7 @@ return new class extends Migration
             $table->date('contract_date');
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
-            $table->foreign('commodity_id')->constrained('commodities')->onDelete('cascade');
+            $table->foreignId('commodity_id')->constrained('commodities')->onDelete('cascade');
             $table->decimal('total_quantity_kg', 10, 2);
             $table->decimal('price_per_kg', 10, 2);
             $table->decimal('tolerated_kk_percentage', 5, 2)->default(0);

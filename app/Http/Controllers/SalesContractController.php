@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Buyer;
+use App\Models\Commodity;
 use App\Models\SalesContract;
 use Exception;
 use Illuminate\Http\Request;
@@ -15,8 +17,10 @@ class SalesContractController extends Controller
      */
     public function index()
     {
-        $salesContracts = SalesContract::orderBy('created_at')->paginate(10);
-        return view('sales_contracts.index', compact('sales_contracts'));
+        $salesContracts = SalesContract::join('buyers', 'buyers.id', '=', 'sales_contracts.buyer_id')
+            ->join('commodities', 'commodities.id', '=', 'sales_contracts.commodity_id')
+            ->get();
+        return view('sales_contracts.index', compact('salesContracts'));
     }
 
     /**
@@ -24,7 +28,9 @@ class SalesContractController extends Controller
      */
     public function create()
     {
-        return view('sales_contracts.create');
+        $buyers = Buyer::all();
+        $commodities = Commodity::all();
+        return view('sales_contracts.create', compact('buyers', 'commodities'));
     }
 
     /**
@@ -39,13 +45,13 @@ class SalesContractController extends Controller
             'contract_date' => 'required|date',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date',
-            'total_quantity_kg' => 'required|decimal',
-            'price_per_kg' => 'required|decimal',
-            'tolerated_kk_percentage' => 'nullable|decimal',
-            'tolerated_ka_percentage' => 'nullable|decimal',
-            'tolerated_ffa_percentage' => 'nullable|decimal',
-            'quantity_received_kg' => 'nullable|decimal',
-            'status' => 'nullable|enum:active,completed,canceled',
+            'total_quantity_kg' => 'required|numeric|min:0',
+            'price_per_kg' => 'required|numeric|min:0',
+            'tolerated_kk_percentage' => 'nullable|numeric|min:0|max:100',
+            'tolerated_ka_percentage' => 'nullable|numeric|min:0|max:100',
+            'tolerated_ffa_percentage' => 'nullable|numeric|min:0|max:100',
+            'quantity_received_kg' => 'nullable|numeric|min:0',
+            'status' => 'nullable|in:active,completed,canceled',
             'notes' => 'nullable|string'
         ]);
 
@@ -55,7 +61,6 @@ class SalesContractController extends Controller
         } catch (Exception $e) {
             Log::error("Gagal menambahkan kontrak penjualan: {$e->getMessage()}", ['exception' => $e]);
             return back()->withInput()->with('error', 'Terjadi kesalahan saat menambahkan kontrak penjualan!');
-        
         }
     }
 
@@ -87,12 +92,12 @@ class SalesContractController extends Controller
             'contract_date' => 'required|date',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date',
-            'total_quantity_kg' => 'required|decimal',
-            'price_per_kg' => 'required|decimal',
-            'tolerated_kk_percentage' => 'nullable|decimal',
-            'tolerated_ka_percentage' => 'nullable|decimal',
-            'tolerated_ffa_percentage' => 'nullable|decimal',
-            'quantity_received_kg' => 'nullable|decimal',
+            'total_quantity_kg' => 'required|numeric|min:0|max:0',
+            'price_per_kg' => 'required|numeric|min:0|max:0',
+            'tolerated_kk_percentage' => 'nullable|numeric|min:0|max:0',
+            'tolerated_ka_percentage' => 'nullable|numeric|min:0|max:0',
+            'tolerated_ffa_percentage' => 'nullable|numeric|min:0|max:0',
+            'quantity_received_kg' => 'nullable|numeric|min:0|max:0',
             'status' => 'nullable|enum:active,completed,canceled',
             'notes' => 'nullable|string'
         ]);
@@ -103,7 +108,6 @@ class SalesContractController extends Controller
         } catch (Exception $e) {
             Log::error("Gagal memperbarui kontrak penjualan: {$e->getMessage()}", ['exception' => $e]);
             return back()->withInput()->with('error', 'Terjadi kesalahan saat memperbarui kontrak penjualan!');
-        
         }
     }
 
