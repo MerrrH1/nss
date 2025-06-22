@@ -12,7 +12,7 @@ class Truck extends Model
     protected $fillable = [
         'plate_number',
         'driver_name',
-        'capacity_kg'
+        'notes'
     ];
 
     public function purchaseReceipts() {

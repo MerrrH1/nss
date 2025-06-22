@@ -35,7 +35,7 @@ class TruckController extends Controller
         $request->validate([
             'driver_name' => 'required|string|max:255',
             'plate_number' => 'required|string|max:20|unique:trucks,plate_number',
-            'capacity_kg' => 'required|integer|min:1'
+            'notes' => 'nullable|string'
         ]);
 
         try {

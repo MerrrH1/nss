@@ -23,7 +23,6 @@ class PurchaseReceipt extends Model
         'kk_percentage',
         'ka_percentage',
         'ffa_percentage',
-        'price_per_kg',
         'claim_amount',
         'total_amount',
         'claim_notes',

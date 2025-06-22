@@ -26,7 +26,6 @@ return new class extends Migration
             $table->decimal('kk_percentage', 5, 2)->nullable();
             $table->decimal('ka_percentage', 5, 2)->nullable();
             $table->decimal('ffa_percentage', 5, 2)->nullable();
-            $table->decimal('price_per_kg', 10, 2)->nullable();
             $table->decimal('claim_amount', 12, 2)->default(0);
             $table->decimal('total_amount', 12, 2);
             $table->text('claim_notes')->nullable();

@@ -13,16 +13,26 @@ class BuyerSeeder extends Seeder
      */
     public function run(): void
     {
-        $buyer = [
-            // 'name' => 'PT. Domas SawitInti Perdana',
-            'name' => 'PT. Bakrie Food And Energy',
-            'address' => 'Jl. Access Road Inalum Km. 15, Lalang, Medang Deras, Batu Bara, Sumatera Utara',
-            'phone' => '081283262822',
-            'contact_person' => '081283262822',
-            'email' => 'silvia.wijaya@bakrieoleo.com',
-            // 'npwp' => '01.947.929.4-072.000'
-            'npwp' => '02.189.870.5-072.000'
+        $buyers = [
+            [
+                'name' => 'PT. Bakrie Food And Energy',
+                'address' => 'Jl. Access Road Inalum Km. 15, Lalang, Medang Deras, Batu Bara, Sumatera Utara',
+                'phone' => '081283262822',
+                'contact_person' => '081283262822',
+                'email' => 'silvia.wijaya@bakrieoleo.com',
+                'npwp' => '02.189.870.5-072.000'
+            ],
+            [
+                'name' => 'PT. Domas SawitInti Perdana',
+                'address' => 'Jl. Access Road Inalum Km. 15, Lalang, Medang Deras, Batu Bara, Sumatera Utara',
+                'phone' => '081283262822',
+                'contact_person' => '081283262822',
+                'email' => 'silvia.wijaya@bakrieoleo.com',
+                'npwp' => '01.947.929.4-072.000'
+            ]
         ];
-        Buyer::create($buyer);
+        foreach($buyers as $buyer) {
+            Buyer::create($buyer);
+        };
     }
 }

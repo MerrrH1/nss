@@ -3,7 +3,11 @@
 use App\Http\Controllers\BuyerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PurchaseContractController;
 use App\Http\Controllers\SalesContractController;
+use App\Http\Controllers\SalesDeliveriesController;
+use App\Http\Controllers\SalesInvoiceController;
+use App\Http\Controllers\SalesTaxInvoiceController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
@@ -17,6 +21,12 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
 Route::get('/buyers', [BuyerController::class, 'index'])->name('buyers.index');
 Route::resource('/sales_contracts', SalesContractController::class);
+Route::resource('/sales_deliveries', SalesDeliveriesController::class);
+Route::get('/create_sales_deliveries/{salesContract}', [SalesDeliveriesController::class, 'createSalesDelivery'])->name('sales_deliveries.createSalesDelivery');
+Route::get('/reject_sales_deliveries/{salesDelivery}', [SalesDeliveriesController::class, 'cancel'])->name('sales_deliveries.cancel');
+Route::resource('/sales_invoices', SalesInvoiceController::class);
+Route::resource('/sales_tax_invoices', SalesTaxInvoiceController::class);
+Route::resource('/purchase_contracts', PurchaseContractController::class);
 });
 
 require __DIR__ . '/auth.php';

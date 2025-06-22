@@ -2,7 +2,7 @@
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Tambah Kontrak Penjualan Baru') }}
-        </h2>
+        </h2>   
     </x-slot>
 
     <div class="py-12">
@@ -83,23 +83,6 @@
                                     @enderror
                                 </div>
                                 <div>
-                                    <label for="status"
-                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status <span
-                                            class="text-red-500">*</span></label>
-                                    <select name="status" id="status" required
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 @error('status') border-red-500 @enderror">
-                                        <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Aktif
-                                        </option>
-                                        <option value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>
-                                            Selesai</option>
-                                        <option value="canceled" {{ old('status') == 'canceled' ? 'selected' : '' }}>
-                                            Batal</option>
-                                    </select>
-                                    @error('status')
-                                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                                    @enderror
-                                </div>
-                                <div>
                                     <label for="total_quantity_kg"
                                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tonase
                                         (Kg)</label>
@@ -168,6 +151,17 @@
                                         id="tolerated_ffa_percentage" value="{{ old('tolerated_ffa_percentage') }}"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 @error('tolerated_ffa_percentage') border-red-500 @enderror">
                                     @error('tolerated_ffa_percentage')
+                                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                <div>
+                                    <label for="tolerated_dobi_percentage"
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Spesifikasi
+                                        DOBI (%)</label>
+                                    <input type="number" step="0.01" name="tolerated_dobi_percentage"
+                                        id="tolerated_dobi_percentage" value="{{ old('tolerated_dobi_percentage') }}"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 @error('tolerated_dobi_percentage') border-red-500 @enderror">
+                                    @error('tolerated_dobi_percentage')
                                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                     @enderror
                                 </div>

@@ -16,7 +16,7 @@ class PurchaseContractController extends Controller
     public function index()
     {
         $purchaseContracts = PurchaseContract::orderBy('created_at')->paginate(10);
-        return view('purchase_contracts.index', compact('purchase_contracts'));
+        return view('purchase_contracts.index', compact('purchaseContracts'));
     }
 
     /**

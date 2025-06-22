@@ -23,10 +23,11 @@ class SalesDeliveries extends Model
         'kk_percentage',
         'ka_percentage',
         'ffa_percentage',
-        'price_per_kg',
+        'dobi',
         'claim_amount',
         'total_amount',
         'claim_notes',
+        'status',
         'notes'
     ];
 

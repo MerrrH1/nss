@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('plate_number')->unique();
             $table->string('driver_name')->nullable();
-            $table->decimal('capacity_kg', 10, 2)->nullable();
+            $table->text('notes')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\SalesContractStatus;
 use App\Models\Buyer;
 use App\Models\Commodity;
 use App\Models\SalesContract;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Enum;
 
 class SalesContractController extends Controller
 {
@@ -17,10 +18,10 @@ class SalesContractController extends Controller
      */
     public function index()
     {
-        $salesContracts = SalesContract::join('buyers', 'buyers.id', '=', 'sales_contracts.buyer_id')
-            ->join('commodities', 'commodities.id', '=', 'sales_contracts.commodity_id')
-            ->get();
-        return view('sales_contracts.index', compact('salesContracts'));
+        $salesContracts = SalesContract::orderBy('contract_date')->paginate(10);
+        $buyers = Buyer::all();
+        $commodities = Commodity::all();
+        return view('sales_contracts.index', compact('salesContracts', 'buyers', 'commodities'));
     }
 
     /**
@@ -43,15 +44,12 @@ class SalesContractController extends Controller
             'buyer_id' => 'required|integer',
             'commodity_id' => 'required|integer',
             'contract_date' => 'required|date',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date',
             'total_quantity_kg' => 'required|numeric|min:0',
             'price_per_kg' => 'required|numeric|min:0',
             'tolerated_kk_percentage' => 'nullable|numeric|min:0|max:100',
             'tolerated_ka_percentage' => 'nullable|numeric|min:0|max:100',
             'tolerated_ffa_percentage' => 'nullable|numeric|min:0|max:100',
-            'quantity_received_kg' => 'nullable|numeric|min:0',
-            'status' => 'nullable|in:active,completed,canceled',
+            'quantity_delivered_kg' => 'nullable|numeric|min:0',
             'notes' => 'nullable|string'
         ]);
 
@@ -69,7 +67,7 @@ class SalesContractController extends Controller
      */
     public function show(SalesContract $salesContract)
     {
-        return view('sales_contracts.index', compact('salesContract'));
+        return view('sales_contracts.show', compact('salesContract'));
     }
 
     /**
@@ -77,7 +75,9 @@ class SalesContractController extends Controller
      */
     public function edit(SalesContract $salesContract)
     {
-        return view('sales_contracts.index', compact('salesContract'));
+        $buyers = Buyer::all();
+        $commodities = Commodity::all();
+        return view('sales_contracts.edit', compact('salesContract', 'buyers', 'commodities'));
     }
 
     /**
@@ -86,24 +86,22 @@ class SalesContractController extends Controller
     public function update(Request $request, SalesContract $salesContract)
     {
         $request->validate([
-            'contract_number' => 'required|string|max:255|' . Rule::unique('contract_number')->ignore($salesContract->id),
+            'contract_number' => 'required|string|max:255|unique:sales_contracts,contract_number,' . $salesContract->id,
             'buyer_id' => 'required|integer',
             'commodity_id' => 'required|integer',
             'contract_date' => 'required|date',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date',
-            'total_quantity_kg' => 'required|numeric|min:0|max:0',
-            'price_per_kg' => 'required|numeric|min:0|max:0',
+            'total_quantity_kg' => 'required|numeric|min:0',
             'tolerated_kk_percentage' => 'nullable|numeric|min:0|max:0',
             'tolerated_ka_percentage' => 'nullable|numeric|min:0|max:0',
             'tolerated_ffa_percentage' => 'nullable|numeric|min:0|max:0',
             'quantity_received_kg' => 'nullable|numeric|min:0|max:0',
-            'status' => 'nullable|enum:active,completed,canceled',
             'notes' => 'nullable|string'
         ]);
 
         try {
-            SalesContract::update($request->all());
+            $salesContract->update($request->all());
             return redirect()->route('sales_contracts.index')->with('success', 'Kontrak penjualan berhasil diperbarui!');
         } catch (Exception $e) {
             Log::error("Gagal memperbarui kontrak penjualan: {$e->getMessage()}", ['exception' => $e]);

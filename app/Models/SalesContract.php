@@ -14,23 +14,20 @@ class SalesContract extends Model
         'buyer_id',
         'contract_number',
         'contract_date',
-        'start_date',
-        'end_date',
         'commodity_id',
         'total_quantity_kg',
         'price_per_kg',
         'tolerated_kk_percentage',
         'tolerated_ka_percentage',
         'tolerated_ffa_percentage',
+        'tolerated_dobi_percentage',
         'quantity_delivered_kg',
         'status',
         'notes'
     ];
 
     protected $casts = [
-        'contract_date' => 'date',
-        'start_date' => 'date',
-        'end_date' => 'date'
+        'contract_date' => 'date'
     ];
 
     public function buyer() {

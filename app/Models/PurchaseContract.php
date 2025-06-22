@@ -13,14 +13,13 @@ class PurchaseContract extends Model
         'supplier_id',
         'purchase_contract_id',
         'contract_date',
-        'start_date',
-        'end_date',
         'commodity_id',
         'total_quantity_kg',
         'price_per_kg',
         'tolerated_kk_percentage',
         'tolerated_ka_percentage',
         'tolerated_ffa_percentage',
+        'tolerated_dobi_percentage',
         'quantity_received_kg',
         'status',
         'notes'
@@ -28,8 +27,6 @@ class PurchaseContract extends Model
 
     protected $casts = [
         'contract_date' => 'date',
-        'start_date' => 'date',
-        'end_date' => 'date'
     ];
 
     public function supplier() {
