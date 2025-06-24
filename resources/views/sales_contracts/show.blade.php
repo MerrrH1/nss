@@ -9,7 +9,18 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-
+                    @if (session('success'))
+                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4"
+                            role="alert">
+                            <span class="block sm:inline">{{ session('success') }}</span>
+                        </div>
+                    @endif
+                    @if (session('error'))
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+                            role="alert">
+                            <span class="block sm:inline">{{ session('error') }}</span>
+                        </div>
+                    @endif
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-lg font-medium">Detail Kontrak Penjualan: {{ $salesContract->contract_number }}
                         </h3>
@@ -90,20 +101,22 @@
 
                     {{-- Action Buttons --}}
                     <div class="mt-8 flex justify-end">
-                        <a href="{{ route('sales_contracts.edit', $salesContract->id) }}"
+                        <a href="{{ route('sales_contracts.edit', $salesContract) }}"
                             class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
                             Edit Kontrak
                         </a>
-                        <form action="{{ route('sales_contracts.destroy', $salesContract->id) }}" method="POST"
-                            class="inline-block ml-3"
-                            onsubmit="return confirm('Apakah Anda yakin ingin menghapus kontrak ini? Tindakan ini tidak dapat dibatalkan.');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit"
-                                class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                Hapus Kontrak
-                            </button>
-                        </form>
+                        @if ($salesContract->quantity_delivered_kg == 0)
+                            <form action="{{ route('sales_contracts.destroy', $salesContract->id) }}" method="POST"
+                                class="inline-block ml-3"
+                                onsubmit="return confirm('Apakah Anda yakin ingin menghapus kontrak ini? Tindakan ini tidak dapat dibatalkan.');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                    class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                    Hapus Kontrak
+                                </button>
+                            </form>
+                        @endif
                     </div>
 
                     {{-- Delivery Units Section --}}
@@ -115,15 +128,36 @@
                                 $salesContract->total_quantity_kg - $salesContract->quantity_delivered_kg;
                         @endphp
                         @if ($remainingForDelivery > 0 && $salesContract->status === 'active')
-                            <a href="{{ route('sales_deliveries.createSalesDelivery', $salesContract) }}"
-                                class="inline-flex items-center mb-5 px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                </svg>
-                                Tambah Unit Pengiriman
-                            </a>
+                            <div class="flex justify-between mb-5"> {{-- Added a flex container with justify-between --}}
+                                <a href="{{ route('sales_deliveries.createSalesDelivery', $salesContract) }}"
+                                    class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    Tambah Unit Pengiriman
+                                </a>
+
+                                <a href="{{ route('sales_contract.closeContract', $salesContract) }}"
+                                    onclick="event.preventDefault(); confirmCloseContract(this);" {{-- Added onclick event --}}
+                                    class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    Tutup Kontrak
+                                </a>
+                            </div>
+
+                            <script>
+                                function confirmCloseContract(element) {
+                                    if (confirm('Apakah Anda yakin ingin menutup kontrak ini? Tindakan ini tidak dapat dibatalkan.')) {
+                                        window.location.href = element.href;
+                                    }
+                                }
+                            </script>
                         @endif
                         @if ($salesContract->salesDeliveries->isEmpty())
                             <p class="text-gray-600 dark:text-gray-400">Tidak ada unit pengiriman yang terkait dengan
@@ -180,17 +214,20 @@
                                                 </td>
                                                 <td
                                                     class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $salesDelivery->status == 'completed' ? 'text-green-500' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-gray-900 dark:text-gray-200') }}">
-                                                    {{ number_format($salesDelivery->net_weight_kg, 0, ',', '.') }}</td>
+                                                    {{ number_format($salesDelivery->net_weight_kg, 0, ',', '.') }}
+                                                </td>
                                                 <td
                                                     class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $salesDelivery->status == 'completed' ? 'text-green-500' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-gray-900 dark:text-gray-200') }}">
                                                     {{ number_format($salesDelivery->final_net_weight_kg, 0, ',', '.') }}
                                                 </td>
                                                 <td
                                                     class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $salesDelivery->status == 'completed' ? 'text-green-500' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-gray-900 dark:text-gray-200') }}">
-                                                    {{ number_format($salesDelivery->kk_percentage, 2, ',', '.') }}</td>
+                                                    {{ number_format($salesDelivery->kk_percentage, 2, ',', '.') }}
+                                                </td>
                                                 <td
                                                     class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $salesDelivery->status == 'completed' ? 'text-green-500' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-gray-900 dark:text-gray-200') }}">
-                                                    {{ number_format($salesDelivery->ka_percentage, 2, ',', '.') }}</td>
+                                                    {{ number_format($salesDelivery->ka_percentage, 2, ',', '.') }}
+                                                </td>
                                                 <td
                                                     class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $salesDelivery->status == 'completed' ? 'text-green-500' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-gray-900 dark:text-gray-200') }}">
                                                     {{ number_format($salesDelivery->ffa_percentage, 2, ',', '.') }}
@@ -203,9 +240,10 @@
                                                     class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $salesDelivery->status == 'completed' ? 'text-green-500' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-gray-900 dark:text-gray-200') }}">
                                                     Rp {{ number_format($salesDelivery->total_amount, 0, ',', '.') }}
                                                 </td>
-                                                <td class="px-6 py-4 text-center whitespace-nowrap text-right text-sm font-medium">
+                                                <td
+                                                    class="px-6 py-4 text-center whitespace-nowrap text-right text-sm font-medium">
                                                     @if ($salesDelivery->status == 'pending')
-                                                        <a href="{{ route('sales_deliveries.edit', $salesDelivery) }}"
+                                                        <a href="{{ route('sales_deliveries.unload', $salesDelivery->id) }}"
                                                             class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-600 mr-3">Edit</a>
                                                         <a href="{{ route('sales_deliveries.cancel', $salesDelivery->id) }}"
                                                             class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-600">Tolak</a>

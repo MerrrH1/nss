@@ -21,8 +21,10 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
 Route::get('/buyers', [BuyerController::class, 'index'])->name('buyers.index');
 Route::resource('/sales_contracts', SalesContractController::class);
+Route::get('close_sales_contracts/{salesContract}', [SalesContractController::class, 'closeContract'])->name('sales_contract.closeContract');
 Route::resource('/sales_deliveries', SalesDeliveriesController::class);
 Route::get('/create_sales_deliveries/{salesContract}', [SalesDeliveriesController::class, 'createSalesDelivery'])->name('sales_deliveries.createSalesDelivery');
+Route::get('/unload_sales_deliveries/{salesDelivery}', [SalesDeliveriesController::class, 'unload'])->name('sales_deliveries.unload');
 Route::get('/reject_sales_deliveries/{salesDelivery}', [SalesDeliveriesController::class, 'cancel'])->name('sales_deliveries.cancel');
 Route::resource('/sales_invoices', SalesInvoiceController::class);
 Route::resource('/sales_tax_invoices', SalesTaxInvoiceController::class);

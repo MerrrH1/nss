@@ -18,6 +18,18 @@ class CommodityController extends Controller
         $commodities = Commodity::orderBy('name')->paginate(10);
         return view('commodities.index', compact('commodities'));
     }
+    /**
+     * Return initials
+     * @param string
+     */
+    public static function getInitial($text) {
+        $words = explode(' ', trim($text));
+        $initials = '';
+        foreach($words as $word) {
+            $initials .= strtoupper($word[0]);
+        }
+        return $initials;
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -68,7 +80,7 @@ class CommodityController extends Controller
     public function update(Request $request, Commodity $commodity)
     {
         $request->validate([
-            'name' => 'required|string|max:255|' . Rule::unique('commodities')->ignore($commodity->id()),,
+            'name' => 'required|string|max:255|unique:commodities,id,' . $commodity->id,
             'description' => 'nullable|string|max:500'
         ]);
 

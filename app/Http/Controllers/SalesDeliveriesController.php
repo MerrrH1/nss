@@ -19,7 +19,7 @@ class SalesDeliveriesController extends Controller
     public function index()
     {
         $salesDeliveries = SalesDeliveries::orderBy('created_at')->paginate(10);
-        return view('sales_deliveries.index', compact('sales_deliveries'));
+        return view('sales_deliveries.index', compact('salesDeliveries'));
     }
 
     /**
@@ -30,7 +30,8 @@ class SalesDeliveriesController extends Controller
         // return view('sales_deliveries.create');
     }
 
-    public function createSalesDelivery(SalesContract $salesContract) {
+    public function createSalesDelivery(SalesContract $salesContract)
+    {
         $trucks = Truck::all();
         return view('sales_deliveries.create', compact('salesContract', 'trucks'));
     }
@@ -50,7 +51,7 @@ class SalesDeliveriesController extends Controller
         ]);
 
         try {
-            $delivery_number = $this->createDeliveryNumber($request->delivery_date);
+            $delivery_number = $this->createDeliveryNumber($request->delivery_date, SalesContract::findOrFail($request->sales_contract_id)->commodity->name);
             $net_weight_kg = $request->input('gross_weight_kg') - $request->input('tare_weight_kg');
             $final_gross_weight_kg = $final_tare_weight_kg = $final_net_weight_kg = 0;
             $data = $request->merge([
@@ -79,7 +80,7 @@ class SalesDeliveriesController extends Controller
      */
     public function show(SalesDeliveries $salesDeliveries)
     {
-        return view('sales_deliveries.show', compact('sales_deliveries'));
+        return view('sales_deliveries.show', compact('salesDeliveries'));
     }
 
     /**
@@ -87,11 +88,21 @@ class SalesDeliveriesController extends Controller
      */
     public function edit(SalesDeliveries $salesDeliveries)
     {
-        return view('sales_deliveries.edit', compact('salesDeliveries'));
+        Log::info($salesDeliveries);
+        return back();
+        // return view('sales_deliveries.edit', compact('salesDeliveries'));
     }
 
-    public function createDeliveryNumber($date) {
-        $prefix = "MT";
+    public function unload(SalesDeliveries $salesDelivery)
+    {
+        $contract = SalesContract::findOrFail($salesDelivery->sales_contract_id);
+        $trucks = Truck::all();
+        return view('sales_deliveries.edit', compact('salesDelivery', 'trucks'));
+    }
+
+    public function createDeliveryNumber($date, $commodity)
+    {
+        $prefix = CommodityController::getInitial($commodity);
         $today = Carbon::parse($date)->format('Ymd');
         $companyCode = "NSS";
 
@@ -107,44 +118,86 @@ class SalesDeliveriesController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, SalesDeliveries $salesDeliveries)
+    public function update(Request $request, SalesDeliveries $salesDelivery)
     {
         $request->validate([
-            'sales_contract_id' => 'required|integer',
-            'truck_id' => 'required|integer',
-            'delivery_number' => 'required|string|max:255|unique:sales_deliveries,delivery_number,' . $salesDeliveries->id,
+            'sales_contract_id' => 'required|integer|exists:sales_contracts,id',
+            'truck_id' => 'required|integer|exists:trucks,id',
             'delivery_date' => 'required|date',
             'gross_weight_kg' => 'required|numeric',
             'tare_weight_kg' => 'required|numeric',
-            'kk_percentage' => 'required|decimal:0,2',
-            'ka_percentage' => 'required|decimal:0,2',
-            'ffa_percentage' => 'required|decimal:0,2',
-            'claim_amount' => 'required|decimal',
-            'total_amount' => 'required|decimal',
+            'final_gross_weight_kg' => 'required|numeric',
+            'final_tare_weight_kg' => 'required|numeric',
+            'final_net_weight_kg' => 'required|numeric',
+            'kk_percentage' => 'nullable|decimal:0,2',
+            'ka_percentage' => 'nullable|decimal:0,2',
+            'ffa_percentage' => 'nullable|decimal:0,2',
+            'dobi' => 'nullable|numeric',
+            'claim_amount' => 'nullable|numeric',
+            'total_amount' => 'nullable|numeric',
             'claim_notes' => 'nullable|string',
             'notes' => 'nullable|string'
         ]);
-
+        $status = "pending";
+        $finalNetWeightKg = null;
+        if ($request->filled('final_gross_weight_kg') && $request->filled('final_tare_weight_kg')) {
+            $finalNetWeightKg = $request->input('final_gross_weight_kg') - $request->input('final_tare_weight_kg');
+        }
+        if (
+            $request->filled('final_gross_weight_kg') && $request->filled('final_tare_weight_kg') &&
+            ($request->filled('kk_percentage') || $request->filled('ka_percentage') || $request->filled('ffa_percentage') || $request->filled('dobi'))
+        ) {
+            $status = "completed";
+        }
+        $oldNetWeightKg = $salesDelivery->net_weight_kg;
+        $oldFinalNetWeightKg = $salesDelivery->final_net_weight_kg;
+        $newNetWeightKg = $request->input('gross_weight_kg') - $request->input('tare_weight_kg');
+        $newFinalNetWeightKg = $request->input('final_gross_weight_kg') - $request->input('final_tare_weight_kg');
+        $salesContract = SalesContract::find($request->input('sales_contract_id'));
+        if (!$salesContract) {
+            return back()->withInput()->with('error', 'Kontrak penjualan tidak ditemukan!');
+        }
+        if($request->ka_percentage + $request->kk_percentage > $salesContract->tolerated_ka_percentage + $salesContract->tolerated_kk_percentage || $request->dobi < $salesContract->tolerated_dobi_percentage || $request->ffa_percentage > $salesContract->tolerated_ffa_percentage) {
+            $claimAmount = $newFinalNetWeightKg * 900;
+        } else {
+            $claimAmount = 0;
+        }
+        Log::info("Tonase : {$newFinalNetWeightKg}, Klaim : {$claimAmount}, Total : " .$newFinalNetWeightKg * $salesContract->price_per_kg - $claimAmount);
         try {
-            $net_weight_kg = $request->input('gross_weight_kg') - $request->input('tare_weight_kg');
-            $final_gross_weight_kg = $final_tare_weight_kg = $final_net_weight_kg = 0;
-            $data = $request->merge([
-                'net_weight_kg' => $net_weight_kg,
-                'final_gross_weight_kg' => $final_gross_weight_kg,
-                'final_tare_weight_kg' => $final_tare_weight_kg,
-                'final_net_weight_kg' => $final_net_weight_kg,
-                'status' => 'pending'
-            ])->all();
+            $salesContract->update([
+                'quantity_delivered_kg' => $salesContract->quantity_delivered_kg - $oldNetWeightKg + $newNetWeightKg
+            ]);
+            $salesDelivery->update([
+                'sales_contract_id' => $request->input('sales_contract_id'),
+                'delivery_date' => $request->input('delivery_date'),
+                'truck_id' => $request->input('truck_id'),
+                'gross_weight_kg' => $request->input('gross_weight_kg'),
+                'tare_weight_kg' => $request->input('tare_weight_kg'),
+                'net_weight_kg' => $request->input('gross_weight_kg') - $request->input('tare_weight_kg'),
+                'final_gross_weight_kg' => $request->input('final_gross_weight_kg'),
+                'final_tare_weight_kg' => $request->input('final_tare_weight_kg'),
+                'final_net_weight_kg' => $finalNetWeightKg,
+                'kk_percentage' => $request->input('kk_percentage'),
+                'ka_percentage' => $request->input('ka_percentage'),
+                'ffa_percentage' => $request->input('ffa_percentage'),
+                'dobi' => $request->input('dobi'),
+                'claim_amount' => $claimAmount,
+                'total_amount' => $newFinalNetWeightKg * $salesContract->price_per_kg - $claimAmount,
+                'claim_notes' => $request->input('claim_notes'),
+                'notes' => $request->input('notes'),
+                'status' => $status,
+            ]);
 
-            SalesDeliveries::update($data);
-            return redirect()->route('sales_deliveries.index')->with('success', 'Pengiriman penjualan berhasil diperbarui!');
+            Log::info("Pengiriman penjualan dengan ID {$salesDelivery->id} berhasil diperbarui.");
+            return redirect()->route('sales_contracts.show', $salesContract)->with('success', 'Pengiriman penjualan berhasil diperbarui!');
         } catch (Exception $e) {
             Log::error("Gagal memperbarui pengiriman penjualan: {$e->getMessage()}", ['exception' => $e]);
             return back()->withInput()->with('error', 'Terjadi kesalahan saat memperbarui pengiriman penjualan!');
         }
     }
 
-    public function cancel(SalesDeliveries $salesDelivery) {
+    public function cancel(SalesDeliveries $salesDelivery)
+    {
         $contract = SalesContract::findOrFail($salesDelivery->sales_contract_id);
         $contract->update(['quantity_delivered_kg' => $contract->quantity_delivered_kg - $salesDelivery->net_weight_kg]);
         $salesDelivery->update(['status' => 'cancelled']);

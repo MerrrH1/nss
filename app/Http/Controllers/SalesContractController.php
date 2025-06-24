@@ -109,6 +109,16 @@ class SalesContractController extends Controller
         }
     }
 
+    public function closeContract(SalesContract $salesContract) {
+        try {
+            $salesContract->update(['status' => 'completed']);
+            return back()->with('success', 'Kontrak penjualan berhasil ditutup di ' . number_format($salesContract->quantity_delivered_kg) . ' kg!');
+        } catch (Exception $e) {
+            Log::error("Gagal menutup kontrak penjualan: {$e->getMessage()}", ['exception' => $e]);
+            return back()->with('error', 'Terjadi kesalahan saat menutup kontrak penjualan!');
+        }
+    }
+
     /**
      * Remove the specified resource from storage.
      */
