@@ -27,8 +27,10 @@ Route::get('/create_sales_deliveries/{salesContract}', [SalesDeliveriesControlle
 Route::get('/unload_sales_deliveries/{salesDelivery}', [SalesDeliveriesController::class, 'unload'])->name('sales_deliveries.unload');
 Route::get('/reject_sales_deliveries/{salesDelivery}', [SalesDeliveriesController::class, 'cancel'])->name('sales_deliveries.cancel');
 Route::resource('/sales_invoices', SalesInvoiceController::class);
+Route::get('/create_sales_invoice/{salesContract}', [SalesInvoiceController::class, 'createSalesInvoice'])->name('sales_invoices.create');
 Route::resource('/sales_tax_invoices', SalesTaxInvoiceController::class);
 Route::resource('/purchase_contracts', PurchaseContractController::class);
 });
 
 require __DIR__ . '/auth.php';
+require __DIR__ . '/api.php';

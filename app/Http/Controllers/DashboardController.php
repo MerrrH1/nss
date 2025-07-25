@@ -48,7 +48,7 @@ class DashboardController extends Controller
                 break;
         }
 
-        $totalSales = SalesDeliveries::whereBetween('delivery_date', [$startDate, $endDate])->sum('total_amount');
+        $totalSales = SalesDeliveries::whereBetween('delivery_date', [$startDate, $endDate])->where('status', '=', 'completed')->sum('total_amount');
         $totalPurchases = PurchaseReceipt::whereBetween('receipt_date', [$startDate, $endDate])->sum('total_amount');
         $netProfit = $totalSales - $totalPurchases;
 

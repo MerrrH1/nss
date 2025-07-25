@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Edit Sales Contract') }}
+            {{ __('Edit Kontrak Penjualan') }}
         </h2>
     </x-slot>
 
@@ -10,11 +10,13 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
 
-                    <h3 class="text-lg font-medium mb-6">Edit Kontrak Penjualan: {{ $salesContract->contract_number }}</h3>
+                    <h3 class="text-lg font-medium mb-6">Edit Kontrak Penjualan: {{ $salesContract->contract_number }}
+                    </h3>
                     {{ (int) $salesContract->price_per_kg }}
                     {{-- Display Validation Errors --}}
                     @if ($errors->any())
-                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+                            role="alert">
                             <strong class="font-bold">Oops!</strong>
                             <span class="block sm:inline">Ada beberapa masalah dengan input Anda.</span>
                             <ul class="mt-3 list-disc list-inside text-sm">
@@ -32,10 +34,13 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {{-- Contract Number --}}
                             <div>
-                                <label for="contract_number" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nomor Kontrak</label>
+                                <label for="contract_number"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nomor
+                                    Kontrak</label>
                                 <input type="text" name="contract_number" id="contract_number"
                                     value="{{ old('contract_number', $salesContract->contract_number) }}"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" required>
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+                                    required>
                                 @error('contract_number')
                                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                 @enderror
@@ -43,9 +48,11 @@
 
                             {{-- Buyer --}}
                             <div>
-                                <label for="buyer_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pelanggan</label>
+                                <label for="buyer_id"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pelanggan</label>
                                 <select name="buyer_id" id="buyer_id"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" required>
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+                                    required>
                                     <option value="">Pilih Pelanggan</option>
                                     @foreach ($buyers as $buyer)
                                         <option value="{{ $buyer->id }}"
@@ -61,9 +68,11 @@
 
                             {{-- Commodity --}}
                             <div>
-                                <label for="commodity_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Produk</label>
+                                <label for="commodity_id"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Produk</label>
                                 <select name="commodity_id" id="commodity_id"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" required>
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+                                    required>
                                     <option value="">Pilih Produk</option>
                                     @foreach ($commodities as $commodity)
                                         <option value="{{ $commodity->id }}"
@@ -79,10 +88,13 @@
 
                             {{-- Contract Date --}}
                             <div>
-                                <label for="contract_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Kontrak</label>
+                                <label for="contract_date"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal
+                                    Kontrak</label>
                                 <input type="date" name="contract_date" id="contract_date"
                                     value="{{ old('contract_date', $salesContract->contract_date->format('Y-m-d')) }}"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" required>
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+                                    required>
                                 @error('contract_date')
                                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                 @enderror
@@ -90,10 +102,13 @@
 
                             {{-- Total Quantity (Kg) --}}
                             <div>
-                                <label for="total_quantity_kg" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Total Kuantitas (Kg)</label>
+                                <label for="total_quantity_kg"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Total Kuantitas
+                                    (Kg)</label>
                                 <input type="number" name="total_quantity_kg" id="total_quantity_kg" step="0.01"
                                     value="{{ (int) old('total_quantity_kg', $salesContract->total_quantity_kg) }}"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" required>
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+                                    required>
                                 @error('total_quantity_kg')
                                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                 @enderror
@@ -101,32 +116,69 @@
 
                             {{-- Price per Kg --}}
                             <div>
-                                <label for="price_per_kg" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Harga per Kg (Rp)</label>
+                                <label for="price_per_kg"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Harga per Kg
+                                    (Rp)</label>
                                 <input type="number" name="price_per_kg" id="price_per_kg" step="0.01"
                                     value="{{ (int) old('price_per_kg', $salesContract->price_per_kg) }}"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" required>
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+                                    required>
                                 @error('price_per_kg')
                                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                 @enderror
                             </div>
 
-                            {{-- Quantity Delivered (Kg) --}}
-                            {{-- Note: This field is often updated automatically based on deliveries,
-                                 but if it's meant to be manually editable for adjustments, keep it.
-                                 Otherwise, consider removing it from the edit form. --}}
                             <div>
-                                <label for="quantity_delivered_kg" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kuantitas Terkirim (Kg)</label>
-                                <input type="number" name="quantity_delivered_kg" id="quantity_delivered_kg" step="0.01"
+                                <label for="quantity_delivered_kg"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kuantitas
+                                    Terkirim (Kg)</label>
+                                <input type="number" name="quantity_delivered_kg" id="quantity_delivered_kg"
+                                    step="0.01"
                                     value="{{ (int) old('quantity_delivered_kg', $salesContract->quantity_delivered_kg) }}"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
                                 @error('quantity_delivered_kg')
                                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                 @enderror
                             </div>
-
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Syarat
+                                    Pembayaran</label>
+                                <div class="mt-1">
+                                    <div class="flex items-center">
+                                        <input type="radio" name="payment_term" id="payment_term_full"
+                                            value="full_payment"
+                                            class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                                            {{ $salesContract->payment_term == 'full_payment' ? 'checked' : '' }}>
+                                        <label for="payment_term_full"
+                                            class="ml-2 block text-sm text-gray-900 dark:text-gray-200">Full
+                                            Payment</label>
+                                    </div>
+                                    <div class="flex items-center mt-2">
+                                        <input type="radio" name="payment_term" id="payment_term_full"
+                                            value="bulk_payment"
+                                            class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                                            {{ $salesContract->payment_term == 'bulk_payment' ? 'checked' : '' }}>
+                                        <label for="payment_term_full"
+                                            class="ml-2 block text-sm text-gray-900 dark:text-gray-200">Curah Bayar</label>
+                                    </div>
+                                    <div class="flex items-center mt-2">
+                                        <input type="radio" name="payment_term" id="payment_term_dp50" value="dp50"
+                                            class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                                            {{ $salesContract->payment_term == 'dp50' ? 'checked' : '' }}>
+                                        <label for="payment_term_dp50"
+                                            class="ml-2 block text-sm text-gray-900 dark:text-gray-200">DP
+                                            50%</label>
+                                    </div>
+                                </div>
+                                @error('payment_term')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
                             {{-- notes --}}
                             <div class="md:col-span-2">
-                                <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Deskripsi (Opsional)</label>
+                                <label for="notes"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Deskripsi
+                                    (Opsional)</label>
                                 <textarea name="notes" id="notes" rows="3"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">{{ old('notes', $salesContract->notes) }}</textarea>
                                 @error('notes')

@@ -33,7 +33,7 @@ class SalesInvoice extends Model
     }
 
     public function salesDeliveries() {
-        return $this->hasMany(SalesDeliveries::class);
+        return $this->belongsToMany(SalesDeliveries::class, 'sales_invoice_delivery');
     }
 
     public function salesTaxInvoice() {

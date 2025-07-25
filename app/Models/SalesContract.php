@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 
 class SalesContract extends Model
 {
@@ -22,6 +22,7 @@ class SalesContract extends Model
         'tolerated_ffa_percentage',
         'tolerated_dobi_percentage',
         'quantity_delivered_kg',
+        'payment_term',
         'status',
         'notes'
     ];
@@ -30,51 +31,68 @@ class SalesContract extends Model
         'contract_date' => 'date'
     ];
 
-    public function buyer() {
+    public function buyer()
+    {
         return $this->belongsTo(Buyer::class);
     }
 
-    public function commodity() {
+    public function commodity()
+    {
         return $this->belongsTo(Commodity::class);
     }
 
-    public function salesDeliveries() {
-        return $this->hasMany(SalesDeliveries::class);
+    public function salesDeliveries()
+    {
+        return $this->hasMany(SalesDeliveries::class)->orderBy('delivery_date');
     }
 
-    public function salesInvoices() {
-        return $this->hasMany(SalesInvoice::class);
+    public function salesInvoices()
+    {
+        return $this->hasMany(SalesInvoice::class, 'sales_contract_id');
     }
 
-    protected function formattedBuyerName() {
-        return Attribute::make(function(string $value, array $attributes) {
-            $this->formatCompanyName($attributes['name']);
-        });
-    }
+    public function isInvoiced($salesContract = null): bool
+    {
+        // Use the current model instance if no specific salesContract is passed
+        $contract = $salesContract ?? $this;
 
-    protected function formatCompanyName(string $fullName) {
-        $cleanName = trim(preg_replace('/\s+/', ' ', $fullName));
-        $upperCleanName = strtoupper($cleanName);
-        if (str_starts_with($upperCleanName, 'PT. ')) {
-            $baseName = trim(substr($cleanName, 4)); // Ambil sisa nama setelah 'PT. '
-            return 'PT. ' . $this->getInitials($baseName);
-        } elseif (str_starts_with($upperCleanName, 'CV. ')) {
-            $baseName = trim(substr($cleanName, 4)); // Ambil sisa nama setelah 'CV. '
-            return 'CV. ' . $this->getInitials($baseName);
+        if ($contract->payment_term === "bulk_payment") {
+            Log::info($contract);
+            // Logika untuk 'bulk_payment':
+            // Asumsi: kontrak bulk_payment dianggap ter-invoice jika setidaknya ada SATU invoice utama
+            // yang terkait dengan kontrak ini.
+            return $contract->salesInvoices()->exists();
+
+            // Alternatif (jika setiap delivery harus ter-invoice terpisah untuk bulk_payment):
+            // $completedDeliveriesCount = $contract->salesDeliveries()
+            //     ->where('status', 'completed')
+            //     ->distinct('delivery_date') // Menghitung tanggal delivery yang unik
+            //     ->count();
+            //
+            // $invoicedDeliveriesCount = $contract->salesInvoiceDeliveries()
+            //     ->distinct('delivery_date') // Atau kolom lain yang menandakan delivery_id yang di-invoice
+            //     ->count();
+            //
+            // return $completedDeliveriesCount > 0 && $completedDeliveriesCount === $invoicedDeliveriesCount;
+
+
+        } elseif ($contract->payment_term === "dp50") {
+            // Logika untuk 'dp50':
+            // Asumsi: kontrak dp50 dianggap ter-invoice jika ada 2 invoice utama (DP + Pelunasan)
+            // yang terkait dengan kontrak ini.
+            $actualMainInvoiceCount = $contract->salesInvoices()->count();
+            $expectedInvoiceCount = 2; // DP + Pelunasan
+
+            return $actualMainInvoiceCount >= $expectedInvoiceCount;
+
+            // Jika Anda ingin memeriksa berdasarkan SalesInvoiceDelivery untuk DP
+            // $dpInvoiced = $contract->salesInvoiceDeliveries()->where('type', 'dp')->exists(); // Asumsi ada kolom 'type'
+            // $finalInvoiced = $contract->salesInvoiceDeliveries()->where('type', 'final')->exists();
+            // return $dpInvoiced && $finalInvoiced;
+
         }
-    }
 
-    private function getInitials(string $text) {
-        $stopWords = ['DAN', 'AND', 'OR', 'DI', 'DARI', 'KE', 'PADA', 'UNTUK', 'DENGAN', 'ATAS', 'BAWAH', 'RAYA', 'UTAMA', 'SENTOSA', 'JAYA', 'PERKASA', 'MAKMUR', 'SEJAHTERA'];
-        $words = explode(' ', strtoupper($text)); // Pecah teks menjadi kata-kata, ubah ke uppercase
-
-        $initials = '';
-        foreach ($words as $word) {
-            $word = trim($word);
-            if (!empty($word) && !in_array($word, $stopWords)) {
-                $initials .= substr($word, 0, 1);
-            }
-        }
-        return $initials;
+        // Jika payment_term tidak dikenali, defaultnya belum ter-invoice
+        return false;
     }
 }

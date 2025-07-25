@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\SalesContractStatus;
 use App\Models\Buyer;
 use App\Models\Commodity;
 use App\Models\SalesContract;
+use App\Models\SalesDeliveries;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Rules\Enum;
 
 class SalesContractController extends Controller
 {
@@ -18,10 +17,22 @@ class SalesContractController extends Controller
      */
     public function index()
     {
+        // $salesContracts = SalesContract::query()->with(['buyer', 'salesDeliveries', 'salesInvoices']);
+        // $salesContracts->where(function($query) {
+        //     $query->where('payment_term', '=', 'dp50')->whereDoesntHave('salesInvoices');
+        //     $query->orWhere(function($q) {
+        //         $q->where('payment_term', '=', 'bulk_payment')->whereHas('salesDeliveries', function($deliveryQuery) {
+        //             $deliveryQuery->where('status', '=', 'completed')->whereNull('sales_invoice_id');
+        //         })->orWhereDoesntHave('salesDeliveries', function($deliveryQuery) {
+        //             $deliveryQuery->where('status', '=', 'completed');
+        //         });
+                
+        //     });
+        // });
         $salesContracts = SalesContract::orderBy('contract_date')->paginate(10);
-        $buyers = Buyer::all();
-        $commodities = Commodity::all();
-        return view('sales_contracts.index', compact('salesContracts', 'buyers', 'commodities'));
+        // $salesContracts = SalesContract::whereRelation('salesInvoices', 'id', '=', '2')->orderBy('contract_date')->paginate(10);
+        // $salesContracts = SalesContract::join('sales_deliveries', 'sales_deliveries.sales_contract_id', '=', 'sales_contracts.id')->whereDoesntHave('salesInvoices')->paginate(10);
+        return view('sales_contracts.index', compact('salesContracts'));
     }
 
     /**
@@ -40,7 +51,7 @@ class SalesContractController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'contract_number' => 'required|string|max:255|unique:sales_contracts,contract_number',
+            'contract_number' => 'nullable|max:255|unique:sales_contracts,contract_number',
             'buyer_id' => 'required|integer',
             'commodity_id' => 'required|integer',
             'contract_date' => 'required|date',
@@ -50,9 +61,9 @@ class SalesContractController extends Controller
             'tolerated_ka_percentage' => 'nullable|numeric|min:0|max:100',
             'tolerated_ffa_percentage' => 'nullable|numeric|min:0|max:100',
             'quantity_delivered_kg' => 'nullable|numeric|min:0',
+            'payment_term' => 'required',
             'notes' => 'nullable|string'
         ]);
-
         try {
             SalesContract::create($request->all());
             return redirect()->route('sales_contracts.index')->with('success', 'Kontrak penjualan berhasil ditambahkan!');
@@ -67,7 +78,10 @@ class SalesContractController extends Controller
      */
     public function show(SalesContract $salesContract)
     {
-        return view('sales_contracts.show', compact('salesContract'));
+
+        $totalSalesByContract = SalesDeliveries::where('sales_contract_id', '=', $salesContract->id)->sum('total_amount');
+        $totalUnloadQuantity = SalesDeliveries::where('sales_contract_id', '=', $salesContract->id)->sum('final_net_weight_kg');
+        return view('sales_contracts.show', compact('salesContract', 'totalSalesByContract', 'totalUnloadQuantity'));
     }
 
     /**
@@ -97,6 +111,7 @@ class SalesContractController extends Controller
             'tolerated_ka_percentage' => 'nullable|numeric|min:0|max:0',
             'tolerated_ffa_percentage' => 'nullable|numeric|min:0|max:0',
             'quantity_received_kg' => 'nullable|numeric|min:0|max:0',
+            'payment_term' => 'required',
             'notes' => 'nullable|string'
         ]);
 
@@ -109,7 +124,8 @@ class SalesContractController extends Controller
         }
     }
 
-    public function closeContract(SalesContract $salesContract) {
+    public function closeContract(SalesContract $salesContract)
+    {
         try {
             $salesContract->update(['status' => 'completed']);
             return back()->with('success', 'Kontrak penjualan berhasil ditutup di ' . number_format($salesContract->quantity_delivered_kg) . ' kg!');

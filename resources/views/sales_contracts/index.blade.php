@@ -130,7 +130,7 @@
                                     <tr>
                                         <td
                                             class="px-6 py-4 text-center whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-200">
-                                            <a href="{{ route('sales_contracts.show', $contract->id) }}"
+                                            <a href="{{ route('sales_contracts.show', $contract) }}"
                                                 class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-600">
                                                 {{ $contract->contract_number }}
                                             </a>
@@ -143,7 +143,7 @@
                                                 {{ $contract->contract_date->format('d M Y') }}</td>
                                         <td
                                             class="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                                            {{ $contract->commodity->name }}
+                                            {{ \App\Helpers::getInitials($contract->commodity->name) }}
                                         </td>
                                         <td
                                             class="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
@@ -191,9 +191,9 @@
                     </div>
 
                     {{-- Paginasi --}}
-                    {{-- <div class="mt-4">
+                    <div class="mt-4">
                         {{ $salesContracts->links() }}
-                    </div> --}}
+                    </div>
 
                 </div>
             </div>

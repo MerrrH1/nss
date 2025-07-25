@@ -2,7 +2,7 @@
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Tambah Kontrak Penjualan Baru') }}
-        </h2>   
+        </h2>
     </x-slot>
 
     <div class="py-12">
@@ -48,7 +48,7 @@
                                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nomor Kontrak
                                         <span class="text-red-500">*</span></label>
                                     <input type="text" name="contract_number" id="contract_number"
-                                        value="{{ old('contract_number') }}" required
+                                        value="{{ old('contract_number') }}"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 @error('contract_number') border-red-500 @enderror">
                                     @error('contract_number')
                                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
@@ -162,6 +162,41 @@
                                         id="tolerated_dobi_percentage" value="{{ old('tolerated_dobi_percentage') }}"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 @error('tolerated_dobi_percentage') border-red-500 @enderror">
                                     @error('tolerated_dobi_percentage')
+                                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Syarat
+                                        Pembayaran</label>
+                                    <div class="mt-1">
+                                        <div class="flex items-center">
+                                            <input type="radio" name="payment_term" id="payment_term_full"
+                                                value="full_payment"
+                                                class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                                                {{ old('payment_term') == 'full_payment' ? 'checked' : '' }}>
+                                            <label for="payment_term_full"
+                                                class="ml-2 block text-sm text-gray-900 dark:text-gray-200">Full
+                                                Payment</label>
+                                        </div>
+                                        <div class="flex items-center mt-2">
+                                            <input type="radio" name="payment_term" id="payment_term_full"
+                                                value="bulk_payment"
+                                                class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                                                {{ old('payment_term') == 'bulk_payment' ? 'checked' : '' }}>
+                                            <label for="payment_term_full"
+                                                class="ml-2 block text-sm text-gray-900 dark:text-gray-200">Curah Bayar</label>
+                                        </div>
+                                        <div class="flex items-center mt-2">
+                                            <input type="radio" name="payment_term" id="payment_term_dp50"
+                                                value="dp50"
+                                                class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                                                {{ old('payment_term') == 'dp50' ? 'checked' : '' }}>
+                                            <label for="payment_term_dp50"
+                                                class="ml-2 block text-sm text-gray-900 dark:text-gray-200">DP
+                                                50%</label>
+                                        </div>
+                                    </div>
+                                    @error('payment_term')
                                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                     @enderror
                                 </div>

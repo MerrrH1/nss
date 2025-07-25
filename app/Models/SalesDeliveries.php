@@ -12,7 +12,6 @@ class SalesDeliveries extends Model
     protected $fillable = [
         'sales_contract_id',
         'truck_id',
-        'delivery_number',
         'delivery_date',
         'gross_weight_kg',
         'tare_weight_kg',
@@ -47,6 +46,6 @@ class SalesDeliveries extends Model
 
     public function salesInvoices()
     {
-        return $this->hasMany(SalesInvoice::class);
+        return $this->belongsToMany(SalesInvoice::class, 'sales_invoice_delivery');
     }
 }

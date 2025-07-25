@@ -74,10 +74,16 @@
                                     {{ number_format($salesContract->quantity_delivered_kg, 0, ',', '.') }} Kg</dd>
                             </div>
                             <div class="sm:col-span-1">
-                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Sisa Kuantitas</dt>
+                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Kuantitas Bongkar</dt>
                                 <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200">
-                                    {{ number_format($salesContract->total_quantity_kg - $salesContract->quantity_delivered_kg, 0, ',', '.') }}
+                                    {{ number_format($totalUnloadQuantity, 0, ',', '.') }}
                                     Kg</dd>
+                            </div>
+                            <div class="sm:col-span-1">
+                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Syarat Pembayaran</dt>
+                                <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200">
+                                    {{ $salesContract->payment_term == 'bulk_payment' ? 'Curah Bayar' : ($salesContract->payment_term == 'dp50' ? 'DP 50%, BP setelah kontrak selesai' : '100% setelah kontrak selesai') }}
+                                </dd>
                             </div>
                             <div class="sm:col-span-1">
                                 <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Status</dt>
@@ -90,6 +96,11 @@
                                         {{ ucfirst($salesContract->status) }}
                                     </span>
                                 </dd>
+                            </div>
+                            <div class="sm:col-span-1">
+                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Penjualan</dt>
+                                <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200">Rp
+                                    {{ number_format($totalSalesByContract, 0, ',', '.') }}</dd>
                             </div>
                             <div class="sm:col-span-2">
                                 <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Deskripsi Kontrak</dt>
@@ -159,8 +170,48 @@
                                 }
                             </script>
                         @endif
+                        @if ($salesContract->payment_term == 'bulk_payment')
+                            <div class="mb-5 flex justify-start">
+                                <a href="{{ route('sales_invoices.create', ['salesContract' => $salesContract]) }}"
+                                    class="inline-flex items-center px-4 py-2 bg-purple-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-purple-700 focus:bg-purple-700 active:bg-purple-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
+                                    </svg>
+                                    Buat Invoice
+                                </a>
+                            </div>
+                        @elseif ($salesContract->payment_term == 'dp50')
+                            @if ($salesContract->salesInvoices->count() == 0)
+                                <div class="mb-5 flex justify-start">
+                                    <a href="{{ route('sales_invoices.create', ['salesContract' => $salesContract]) }}"
+                                        class="inline-flex items-center px-4 py-2 bg-purple-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-purple-700 focus:bg-purple-700 active:bg-purple-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
+                                        </svg>
+                                        Buat Invoice DP
+                                    </a>
+                                </div>
+                            @else
+                                <div class="mb-5 flex justify-start">
+                                    <a href="{{ route('sales_invoices.create', ['salesContract' => $salesContract]) }}"
+                                        class="inline-flex items-center px-4 py-2 bg-purple-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-purple-700 focus:bg-purple-700 active:bg-purple-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
+                                        </svg>
+                                        Buat Invoice Pelunasan
+                                    </a>
+                                </div>
+                            @endif
+                        @endif
                         @if ($salesContract->salesDeliveries->isEmpty())
-                            <p class="text-gray-600 dark:text-gray-400">Tidak ada unit pengiriman yang terkait dengan
+                            <p class="text-gray-600 dark:text-gray-400">Tidak ada unit pengiriman yang terkait
+                                dengan
                                 kontrak ini.</p>
                         @else
                             <div class="overflow-x-auto">
@@ -190,6 +241,9 @@
                                                 FFA (%)</th>
                                             <th scope="col"
                                                 class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                                                DOBI (%)</th>
+                                            <th scope="col"
+                                                class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
                                                 Jumlah Klaim</th>
                                             <th scope="col"
                                                 class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
@@ -203,42 +257,46 @@
                                         class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
                                         @foreach ($salesContract->salesDeliveries as $salesDelivery)
                                             <tr
-                                                class="{{ $salesDelivery->status == 'completed' ? 'text-green-500' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-gray-900 dark:text-gray-200') }}">
+                                                class="{{ $salesDelivery->status == 'completed' ? 'text-gray-900 dark:text-gray-200' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-yellow-200') }}">
                                                 <td
-                                                    class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $salesDelivery->status == 'completed' ? 'text-green-500' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-gray-900 dark:text-gray-200') }}">
+                                                    class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $salesDelivery->status == 'completed' ? 'text-gray-900 dark:text-gray-200' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-yellow-200') }}">
                                                     {{ $salesDelivery->delivery_date->format('d M Y') }}</td>
                                                 <td
-                                                    class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $salesDelivery->status == 'completed' ? 'text-green-500' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-gray-900 dark:text-gray-200') }}">
+                                                    class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $salesDelivery->status == 'completed' ? 'text-gray-900 dark:text-gray-200' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-yellow-200') }}">
                                                     {{ $salesDelivery->truck->plate_number ?? 'N/A' }}
                                                     {{-- Assuming a 'plate_number' attribute on Truck --}}
                                                 </td>
                                                 <td
-                                                    class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $salesDelivery->status == 'completed' ? 'text-green-500' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-gray-900 dark:text-gray-200') }}">
+                                                    class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $salesDelivery->status == 'completed' ? 'text-gray-900 dark:text-gray-200' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-yellow-200') }}">
                                                     {{ number_format($salesDelivery->net_weight_kg, 0, ',', '.') }}
                                                 </td>
                                                 <td
-                                                    class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $salesDelivery->status == 'completed' ? 'text-green-500' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-gray-900 dark:text-gray-200') }}">
+                                                    class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $salesDelivery->status == 'completed' ? 'text-gray-900 dark:text-gray-200' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-yellow-200') }}">
                                                     {{ number_format($salesDelivery->final_net_weight_kg, 0, ',', '.') }}
                                                 </td>
                                                 <td
-                                                    class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $salesDelivery->status == 'completed' ? 'text-green-500' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-gray-900 dark:text-gray-200') }}">
+                                                    class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $salesDelivery->status == 'completed' ? 'text-gray-900 dark:text-gray-200' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-yellow-200') }}">
                                                     {{ number_format($salesDelivery->kk_percentage, 2, ',', '.') }}
                                                 </td>
                                                 <td
-                                                    class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $salesDelivery->status == 'completed' ? 'text-green-500' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-gray-900 dark:text-gray-200') }}">
+                                                    class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $salesDelivery->status == 'completed' ? 'text-gray-900 dark:text-gray-200' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-yellow-200') }}">
                                                     {{ number_format($salesDelivery->ka_percentage, 2, ',', '.') }}
                                                 </td>
                                                 <td
-                                                    class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $salesDelivery->status == 'completed' ? 'text-green-500' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-gray-900 dark:text-gray-200') }}">
+                                                    class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $salesDelivery->status == 'completed' ? 'text-gray-900 dark:text-gray-200' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-yellow-200') }}">
                                                     {{ number_format($salesDelivery->ffa_percentage, 2, ',', '.') }}
                                                 </td>
                                                 <td
-                                                    class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $salesDelivery->status == 'completed' ? 'text-green-500' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-gray-900 dark:text-gray-200') }}">
-                                                    Rp {{ number_format($salesDelivery->claim_amount, 0, ',', '.') }}
+                                                    class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $salesDelivery->status == 'completed' ? 'text-gray-900 dark:text-gray-200' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-yellow-200') }}">
+                                                    {{ number_format($salesDelivery->dobi, 2, ',', '.') }}
                                                 </td>
                                                 <td
-                                                    class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $salesDelivery->status == 'completed' ? 'text-green-500' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-gray-900 dark:text-gray-200') }}">
-                                                    Rp {{ number_format($salesDelivery->total_amount, 0, ',', '.') }}
+                                                    class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $salesDelivery->status == 'completed' ? 'text-gray-900 dark:text-gray-200' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-yellow-200') }}">
+                                                    {{ $salesDelivery->claim_amount == 0 ? '-' : 'Rp ' . number_format($salesDelivery->claim_amount, 0, ',', '.') }}
+                                                </td>
+                                                <td
+                                                    class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $salesDelivery->status == 'completed' ? 'text-gray-900 dark:text-gray-200' : ($salesDelivery->status == 'cancelled' ? 'text-red-400' : 'text-yellow-200') }}">
+                                                    {{ $salesDelivery->total_amount == 0 ? '-' : 'Rp ' . number_format($salesDelivery->total_amount, 0, ',', '.') }}
                                                 </td>
                                                 <td
                                                     class="px-6 py-4 text-center whitespace-nowrap text-right text-sm font-medium">

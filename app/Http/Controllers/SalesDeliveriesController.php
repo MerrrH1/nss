@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers;
 use App\Models\SalesContract;
 use App\Models\SalesDeliveries;
 use App\Models\Truck;
@@ -18,7 +19,7 @@ class SalesDeliveriesController extends Controller
      */
     public function index()
     {
-        $salesDeliveries = SalesDeliveries::orderBy('created_at')->paginate(10);
+        $salesDeliveries = SalesDeliveries::orderBy('delivery_date')->paginate(10);
         return view('sales_deliveries.index', compact('salesDeliveries'));
     }
 
@@ -32,7 +33,7 @@ class SalesDeliveriesController extends Controller
 
     public function createSalesDelivery(SalesContract $salesContract)
     {
-        $trucks = Truck::all();
+        $trucks = Truck::orderBy('plate_number')->get();
         return view('sales_deliveries.create', compact('salesContract', 'trucks'));
     }
 
@@ -51,11 +52,9 @@ class SalesDeliveriesController extends Controller
         ]);
 
         try {
-            $delivery_number = $this->createDeliveryNumber($request->delivery_date, SalesContract::findOrFail($request->sales_contract_id)->commodity->name);
             $net_weight_kg = $request->input('gross_weight_kg') - $request->input('tare_weight_kg');
             $final_gross_weight_kg = $final_tare_weight_kg = $final_net_weight_kg = 0;
             $data = $request->merge([
-                'delivery_number' => $delivery_number,
                 'net_weight_kg' => $net_weight_kg,
                 'final_gross_weight_kg' => $final_gross_weight_kg,
                 'final_tare_weight_kg' => $final_tare_weight_kg,
@@ -100,21 +99,6 @@ class SalesDeliveriesController extends Controller
         return view('sales_deliveries.edit', compact('salesDelivery', 'trucks'));
     }
 
-    public function createDeliveryNumber($date, $commodity)
-    {
-        $prefix = CommodityController::getInitial($commodity);
-        $today = Carbon::parse($date)->format('Ymd');
-        $companyCode = "NSS";
-
-        $countDelivery = SalesDeliveries::whereDate('delivery_date', '=', $date)->count();
-        if ($countDelivery > 0) {
-            $nextNumber = str_pad($countDelivery + 1, 3, '0', STR_PAD_LEFT);
-        } else {
-            $nextNumber = "001";
-        }
-        $generatedCode = "{$prefix}/{$today}/{$companyCode}/{$nextNumber}";
-        return $generatedCode;
-    }
     /**
      * Update the specified resource in storage.
      */
@@ -124,11 +108,11 @@ class SalesDeliveriesController extends Controller
             'sales_contract_id' => 'required|integer|exists:sales_contracts,id',
             'truck_id' => 'required|integer|exists:trucks,id',
             'delivery_date' => 'required|date',
-            'gross_weight_kg' => 'required|numeric',
-            'tare_weight_kg' => 'required|numeric',
-            'final_gross_weight_kg' => 'required|numeric',
-            'final_tare_weight_kg' => 'required|numeric',
-            'final_net_weight_kg' => 'required|numeric',
+            'gross_weight_kg' => 'required|integer',
+            'tare_weight_kg' => 'required|integer',
+            'final_gross_weight_kg' => 'required|integer',
+            'final_tare_weight_kg' => 'required|integer',
+            'final_net_weight_kg' => 'required|integer',
             'kk_percentage' => 'nullable|decimal:0,2',
             'ka_percentage' => 'nullable|decimal:0,2',
             'ffa_percentage' => 'nullable|decimal:0,2',
@@ -157,12 +141,12 @@ class SalesDeliveriesController extends Controller
         if (!$salesContract) {
             return back()->withInput()->with('error', 'Kontrak penjualan tidak ditemukan!');
         }
-        if($request->ka_percentage + $request->kk_percentage > $salesContract->tolerated_ka_percentage + $salesContract->tolerated_kk_percentage || $request->dobi < $salesContract->tolerated_dobi_percentage || $request->ffa_percentage > $salesContract->tolerated_ffa_percentage) {
+        // dd($request->ka_percentage + $request->kk_percentage > $salesContract->tolerated_ka_percentage + $salesContract->tolerated_kk_percentage, $request->dobi < $salesContract->tolerated_dobi_percentage && $request->dobi, $request->ffa_percentage > $salesContract->tolerated_ffa_percentage);
+        if($request->ka_percentage + $request->kk_percentage > $salesContract->tolerated_ka_percentage + $salesContract->tolerated_kk_percentage || ($request->dobi < $salesContract->tolerated_dobi_percentage && $request->dobi) || $request->ffa_percentage > $salesContract->tolerated_ffa_percentage) {
             $claimAmount = $newFinalNetWeightKg * 900;
         } else {
             $claimAmount = 0;
         }
-        Log::info("Tonase : {$newFinalNetWeightKg}, Klaim : {$claimAmount}, Total : " .$newFinalNetWeightKg * $salesContract->price_per_kg - $claimAmount);
         try {
             $salesContract->update([
                 'quantity_delivered_kg' => $salesContract->quantity_delivered_kg - $oldNetWeightKg + $newNetWeightKg
@@ -171,12 +155,12 @@ class SalesDeliveriesController extends Controller
                 'sales_contract_id' => $request->input('sales_contract_id'),
                 'delivery_date' => $request->input('delivery_date'),
                 'truck_id' => $request->input('truck_id'),
-                'gross_weight_kg' => $request->input('gross_weight_kg'),
-                'tare_weight_kg' => $request->input('tare_weight_kg'),
-                'net_weight_kg' => $request->input('gross_weight_kg') - $request->input('tare_weight_kg'),
-                'final_gross_weight_kg' => $request->input('final_gross_weight_kg'),
-                'final_tare_weight_kg' => $request->input('final_tare_weight_kg'),
-                'final_net_weight_kg' => $finalNetWeightKg,
+                'gross_weight_kg' => (int) $request->input('gross_weight_kg'),
+                'tare_weight_kg' => (int) $request->input('tare_weight_kg'),
+                'net_weight_kg' => (int) $request->input('gross_weight_kg') - $request->input('tare_weight_kg'),
+                'final_gross_weight_kg' => (int) $request->input('final_gross_weight_kg'),
+                'final_tare_weight_kg' => (int) $request->input('final_tare_weight_kg'),
+                'final_net_weight_kg' => (int) $finalNetWeightKg,
                 'kk_percentage' => $request->input('kk_percentage'),
                 'ka_percentage' => $request->input('ka_percentage'),
                 'ffa_percentage' => $request->input('ffa_percentage'),
@@ -187,8 +171,10 @@ class SalesDeliveriesController extends Controller
                 'notes' => $request->input('notes'),
                 'status' => $status,
             ]);
-
-            Log::info("Pengiriman penjualan dengan ID {$salesDelivery->id} berhasil diperbarui.");
+            if (SalesDeliveries::where('sales_contract_id', '=', $salesDelivery->sales_contract_id)->where('status', '!=', 'pending')->count() == SalesDeliveries::where('sales_contract_id', '=', $salesDelivery->sales_contract_id)->count()) {
+                $contract = SalesContract::where('id', '=', $salesDelivery->sales_contract_id);
+                $contract->update(['status' => 'completed']);
+            }
             return redirect()->route('sales_contracts.show', $salesContract)->with('success', 'Pengiriman penjualan berhasil diperbarui!');
         } catch (Exception $e) {
             Log::error("Gagal memperbarui pengiriman penjualan: {$e->getMessage()}", ['exception' => $e]);
