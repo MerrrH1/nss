@@ -17,21 +17,12 @@ class SalesContractController extends Controller
      */
     public function index()
     {
-        // $salesContracts = SalesContract::query()->with(['buyer', 'salesDeliveries', 'salesInvoices']);
-        // $salesContracts->where(function($query) {
-        //     $query->where('payment_term', '=', 'dp50')->whereDoesntHave('salesInvoices');
-        //     $query->orWhere(function($q) {
-        //         $q->where('payment_term', '=', 'bulk_payment')->whereHas('salesDeliveries', function($deliveryQuery) {
-        //             $deliveryQuery->where('status', '=', 'completed')->whereNull('sales_invoice_id');
-        //         })->orWhereDoesntHave('salesDeliveries', function($deliveryQuery) {
-        //             $deliveryQuery->where('status', '=', 'completed');
-        //         });
-                
-        //     });
-        // });
-        $salesContracts = SalesContract::orderBy('contract_date')->paginate(10);
-        // $salesContracts = SalesContract::whereRelation('salesInvoices', 'id', '=', '2')->orderBy('contract_date')->paginate(10);
-        // $salesContracts = SalesContract::join('sales_deliveries', 'sales_deliveries.sales_contract_id', '=', 'sales_contracts.id')->whereDoesntHave('salesInvoices')->paginate(10);
+        $statusOrder = ['active', 'completed', 'cancelled'];
+        $statusOrderString = "'" . implode("','", $statusOrder) . "'";
+
+        $salesContracts = SalesContract::orderByRaw("FIELD(status, {$statusOrderString})")
+                                     ->orderBy('contract_date', 'asc')
+                                     ->paginate(20);
         return view('sales_contracts.index', compact('salesContracts'));
     }
 
