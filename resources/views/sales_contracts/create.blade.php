@@ -212,44 +212,6 @@
                             </div>
                         </div>
 
-                        {{-- Bagian Detail Produk & Harga (Opsional, jika kontrak memiliki banyak item) --}}
-                        {{-- Ini membutuhkan JavaScript untuk menambahkan/menghapus baris secara dinamis --}}
-                        {{-- Contoh struktur dasar item, perlu JS untuk membuatnya dinamis: --}}
-                        {{-- <div class="mb-8">
-                            <h3 class="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">Detail Produk Kontrak</h3>
-                            <div id="contract-items-container">
-                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mb-4">
-                                    <div>
-                                        <label for="product_id_0" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Produk</label>
-                                        <select name="items[0][product_id]" id="product_id_0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200">
-                                            <option value="">Pilih Produk</option>
-                                            @foreach ($products as $product)
-                                                <option value="{{ $product->id }}">{{ $product->name }} ({{ $product->unit }})</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label for="volume_0" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Volume</label>
-                                        <input type="number" step="0.01" name="items[0][volume]" id="volume_0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200">
-                                    </div>
-                                    <div>
-                                        <label for="unit_price_0" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Harga Satuan</label>
-                                        <input type="number" step="0.01" name="items[0][unit_price]" id="unit_price_0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200">
-                                    </div>
-                                    <div>
-                                        <label for="price_condition_0" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kondisi Harga</label>
-                                        <select name="items[0][price_condition]" id="price_condition_0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200">
-                                            <option value="Fixed">Tetap</option>
-                                            <option value="Index">Mengikuti Indeks</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <button type="button" id="add-item-btn" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700">
-                                Tambah Item Produk
-                            </button>
-                        </div> --}}
-
                         <div class="flex justify-end">
                             <button type="submit"
                                 class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
@@ -269,52 +231,3 @@
         </div>
     </div>
 </x-app-layout>
-
-{{-- Script JS untuk menambah item dinamis (jika diaktifkan) --}}
-{{-- @push('scripts')
-<script>
-    let itemIndex = 1; // Mulai dari 1 karena 0 sudah ada secara statis (jika di uncomment)
-    document.getElementById('add-item-btn').addEventListener('click', function () {
-        const container = document.getElementById('contract-items-container');
-        const newItem = document.createElement('div');
-        newItem.classList.add('grid', 'grid-cols-1', 'md:grid-cols-4', 'gap-4', 'bg-gray-50', 'dark:bg-gray-700', 'p-4', 'rounded-lg', 'mb-4'); // Tambahkan kelas untuk styling
-        newItem.innerHTML = `
-            <div>
-                <label for="product_id_${itemIndex}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Produk</label>
-                <select name="items[${itemIndex}][product_id]" id="product_id_${itemIndex}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200">
-                    <option value="">Pilih Produk</option>
-                    @foreach ($products as $product)
-                        <option value="{{ $product->id }}">{{ $product->name }} ({{ $product->unit }})</option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                <label for="volume_${itemIndex}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Volume</label>
-                <input type="number" step="0.01" name="items[${itemIndex}][volume]" id="volume_${itemIndex}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200">
-            </div>
-            <div>
-                <label for="unit_price_${itemIndex}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Harga Satuan</label>
-                <input type="number" step="0.01" name="items[${itemIndex}][unit_price]" id="unit_price_${itemIndex}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200">
-            </div>
-            <div>
-                <label for="price_condition_${itemIndex}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kondisi Harga</label>
-                <select name="items[${itemIndex}][price_condition]" id="price_condition_${itemIndex}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200">
-                    <option value="Fixed">Tetap</option>
-                    <option value="Index">Mengikuti Indeks</option>
-                </select>
-            </div>
-            <div class="md:col-span-4 text-right">
-                <button type="button" class="remove-item-btn text-red-600 hover:text-red-900">Hapus Item</button>
-            </div>
-        `;
-        container.appendChild(newItem);
-
-        // Menambahkan event listener untuk tombol hapus item
-        newItem.querySelector('.remove-item-btn').addEventListener('click', function() {
-            newItem.remove();
-        });
-
-        itemIndex++;
-    });
-</script>
-@endpush --}}

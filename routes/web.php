@@ -19,7 +19,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/buyers', [BuyerController::class, 'index'])->name('buyers.index');
+    Route::resource('buyers', BuyerController::class);
     Route::resource('/sales_contracts', SalesContractController::class);
     Route::get('close_sales_contracts/{salesContract}', [SalesContractController::class, 'closeContract'])->name('sales_contract.closeContract');
     Route::resource('/sales_deliveries', SalesDeliveriesController::class);

@@ -72,16 +72,16 @@ class BuyerController extends Controller
     public function update(Request $request, Buyer $buyer)
     {
         $request->validate([
-            'name' => 'required|string|max:255|' . Rule::unique('buyers')->ignore($buyer->id()),
+            'name' => 'required|string|max:255|unique:buyers,id,' . $buyer->id,
             'address' => 'nullable|string|max:500',
             'phone' => 'nullable|string|max:20',
             'contact_person' => 'nullable|string|max:255',
             'email' => 'nullable|string|max:255|unique:buyers,email',
-            'npwp' => 'nullable|string|max:20' . Rule::unique('buyers')->ignore($buyer->id()),
+            'npwp' => 'nullable|string|max:20|unique:buyers,id,' . $buyer->id,
         ]);
 
         try {
-            Buyer::update($request->all());
+            $buyer->update($request->all());
             return redirect()->route('buyers.index')->with('success', 'Pembeli berhasil diperbarui!');
         } catch (Exception $e) {
             Log::error("Gagal memperbarui pembeli: {$e->getMessage()}", ['exception' => $e]);
