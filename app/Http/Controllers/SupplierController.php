@@ -72,16 +72,16 @@ class SupplierController extends Controller
     public function update(Request $request, Supplier $supplier)
     {
         $request->validate([
-            'name' => 'required|string|max:255|' . Rule::unique('suppliers')->ignore($supplier->id()),
+            'name' => 'required|string|max:255|unique:suppliers,id,' . $supplier->id ,
             'address' => 'nullable|string|max:500',
             'phone' => 'nullable|string|max:20',
             'contact_person' => 'nullable|string|max:255',
             'email' => 'nullable|string|max:255|unique:suppliers,email',
-            'npwp' => 'nullable|string|max:20|' . Rule::unique('suppliers')->ignore($supplier->id()),
+            'npwp' => 'nullable|string|max:20|unique:suppliers,id,' . $supplier->npwp
         ]);
 
         try {
-            Supplier::update($request->all());
+            $supplier->update($request->all());
             return redirect()->route('suppliers.index')->with('success', 'Penjual berhasil diperbarui!');
         } catch (Exception $e) {
             Log::error("Gagal memperbarui penjual: {$e->getMessage()}", ['exception' => $e]);

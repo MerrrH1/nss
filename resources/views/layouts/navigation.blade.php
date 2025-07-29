@@ -17,19 +17,34 @@
                     </x-nav-link>
                 </div>
 
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('buyers.index')" :active="request()->routeIs('buyers.index')">
-                        {{ __('Pembeli') }}
-                    </x-nav-link>
+                <!-- Tambahkan Alpine.js di layout jika belum -->
+                <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+                <!-- Dropdown Hover -->
+                <div x-data="{ open: false }" class="relative hidden sm:flex items-center sm:ms-10">
+                    <div @mouseenter="open = true" @mouseleave="open = false" class="relative">
+                        <button class="text-white px-4 py-2 hover:text-purple-400 focus:outline-none">
+                            Pilih Peran
+                        </button>
+
+                        <div x-show="open" @mouseenter="open = true" @mouseleave="open = false"
+                            class="absolute left-0 mt-1 w-40 bg-gray-800 text-white rounded-md shadow-lg z-50"
+                            x-transition>
+                            <a href="{{ route('suppliers.index') }}"
+                                class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('sales.*') ? 'bg-gray-700 text-purple-400' : '' }}">
+                                Penjual
+                            </a>
+                            <a href="{{ route('buyers.index') }}"
+                                class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('buyers.*') ? 'bg-gray-700 text-purple-400' : '' }}">
+                                Pembeli
+                            </a>
+                        </div>
+                    </div>
                 </div>
+                
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('sales_contracts.index')" :active="request()->routeIs('sales_contracts.*')">
                         {{ __('Kontrak Penjualan') }}
-                    </x-nav-link>
-                </div>
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('sales_deliveries.index')" :active="request()->routeIs('sales_deliveries.index')">
-                        {{ __('Detail Penjualan') }}
                     </x-nav-link>
                 </div>
             </div>

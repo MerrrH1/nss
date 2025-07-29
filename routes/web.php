@@ -8,6 +8,7 @@ use App\Http\Controllers\SalesContractController;
 use App\Http\Controllers\SalesDeliveriesController;
 use App\Http\Controllers\SalesInvoiceController;
 use App\Http\Controllers\SalesTaxInvoiceController;
+use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
@@ -20,6 +21,7 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::resource('buyers', BuyerController::class);
+    Route::resource('suppliers', SupplierController::class);
     Route::resource('/sales_contracts', SalesContractController::class);
     Route::get('close_sales_contracts/{salesContract}', [SalesContractController::class, 'closeContract'])->name('sales_contract.closeContract');
     Route::resource('/sales_deliveries', SalesDeliveriesController::class);

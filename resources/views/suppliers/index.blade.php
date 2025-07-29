@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Buyers') }}
+            {{ __('Suppliers') }}
         </h2>
     </x-slot>
 
@@ -23,15 +23,15 @@
                     @endif
 
                     <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg font-medium">Manajemen Pembeli</h3>
-                        <a href="{{ route('buyers.create') }}"
+                        <h3 class="text-lg font-medium">Manajemen Penjual</h3>
+                        <a href="{{ route('suppliers.create') }}"
                             class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                             </svg>
-                            Tambah Pembeli Baru
+                            Tambah Penjual Baru
                         </a>
                     </div>
 
@@ -42,7 +42,7 @@
                                 <tr>
                                     <th scope="col"
                                         class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                        Nama Pembeli</th>
+                                        Nama Penjual</th>
                                     <th scope="col"
                                         class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
                                         Alamat</th>
@@ -52,21 +52,21 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                                @forelse ($buyers as $buyer)
+                                @forelse ($suppliers as $supplier)
                                     <tr>
                                         <td
                                             class="px-6 py-4 text-left whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-200">
-                                            <a href="{{ route('buyers.show', $buyer) }}"
+                                            <a href="{{ route('suppliers.show', $supplier) }}"
                                                 class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-600">
-                                                {{ $buyer->name }}
+                                                {{ $supplier->name }}
                                             </a>
                                         </td>
                                         <td
                                             class="px-6 py-4 text-left break-words whitespace-normal text-sm text-gray-900 dark:text-gray-200">
-                                            {{ $buyer->address }}</td>
+                                            {{ $supplier->address }}</td>
                                         <td
                                             class="px-6 py-4 text-center whitespace-nowrap text-right text-sm font-medium">
-                                            <a href="{{ route('buyers.show', $buyer->id) }}"
+                                            <a href="{{ route('suppliers.show', $supplier->id) }}"
                                                 class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-600 mr-3">Lihat</a>
                                         </td>
                                     </tr>
@@ -74,7 +74,7 @@
                                     <tr>
                                         <td colspan="10"
                                             class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
-                                            Tidak ada pembeli yang ditemukan.</td>
+                                            Tidak ada penjual yang ditemukan.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -83,7 +83,7 @@
 
                     {{-- Paginasi --}}
                     <div class="mt-4">
-                        {{ $buyers->links() }}
+                        {{ $suppliers->links() }}
                     </div>
 
                 </div>
