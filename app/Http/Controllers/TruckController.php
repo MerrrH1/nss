@@ -15,7 +15,7 @@ class TruckController extends Controller
      */
     public function index()
     {
-        $trucks = Truck::orderBy('name')->paginate(10);
+        $trucks = Truck::paginate(10);
         return view('trucks.index', compact('trucks'));
     }
 

@@ -35,62 +35,6 @@
                         </a>
                     </div>
 
-                    <form action="{{ route('sales_contracts.index') }}" method="GET"
-                        class="mb-6 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow-sm">
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div>
-                                <label for="search"
-                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pencarian:</label>
-                                <input type="text" name="search" id="search" value="{{ request('search') }}"
-                                    placeholder="No. Kontrak, Pelanggan, Produk..."
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200">
-                            </div>
-                            <div>
-                                <label for="status"
-                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status:</label>
-                                <select name="status" id="status"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200">
-                                    <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Aktif
-                                    </option>
-                                    <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>
-                                        Selesai</option>
-                                    <option value="canceled" {{ request('status') == 'canceled' ? 'selected' : '' }}>
-                                        Batal</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="start_date"
-                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tgl. Mulai
-                                    Dari:</label>
-                                <input type="date" name="start_date" id="start_date"
-                                    value="{{ request('start_date') }}"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200">
-                            </div>
-                            <div>
-                                <label for="end_date"
-                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tgl. Berakhir
-                                    Sampai:</label>
-                                <input type="date" name="end_date" id="end_date" value="{{ request('end_date') }}"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200">
-                            </div>
-                        </div>
-                        <div class="mt-4 flex justify-end">
-                            <button type="submit"
-                                class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 dark:bg-gray-700 dark:hover:bg-gray-600">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                </svg>
-                                Cari
-                            </button>
-                            <a href="{{ route('sales_contracts.index') }}"
-                                class="ml-2 inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700">
-                                Reset
-                            </a>
-                        </div>
-                    </form>
-
                     {{-- Tabel Daftar Kontrak --}}
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">

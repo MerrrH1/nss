@@ -24,7 +24,7 @@
                 <div x-data="{ open: false }" class="relative hidden sm:flex items-center sm:ms-10">
                     <div @mouseenter="open = true" @mouseleave="open = false" class="relative">
                         <button class="text-white px-4 py-2 hover:text-purple-400 focus:outline-none">
-                            Pilih Peran
+                            Data
                         </button>
 
                         <div x-show="open" @mouseenter="open = true" @mouseleave="open = false"
@@ -38,14 +38,41 @@
                                 class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('buyers.*') ? 'bg-gray-700 text-purple-400' : '' }}">
                                 Pembeli
                             </a>
+                            <a href="{{ route('trucks.index') }}"
+                                class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('trucks.*') ? 'bg-gray-700 text-purple-400' : '' }}">
+                                Truk
+                            </a>
                         </div>
                     </div>
                 </div>
-                
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('sales_contracts.index')" :active="request()->routeIs('sales_contracts.*')">
-                        {{ __('Kontrak Penjualan') }}
-                    </x-nav-link>
+
+                <div x-data="{ open: false }" class="relative hidden sm:flex items-center sm:ms-10">
+                    <div @mouseenter="open = true" @mouseleave="open = false" class="relative">
+                        <button class="text-white px-4 py-2 hover:text-purple-400 focus:outline-none">
+                            Data Penjualan
+                        </button>
+
+                        <div x-show="open" @mouseenter="open = true" @mouseleave="open = false"
+                            class="absolute left-0 mt-1 w-40 bg-gray-800 text-white rounded-md shadow-lg z-50"
+                            x-transition>
+                            <a href="{{ route('sales_contracts.index') }}"
+                                class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('sales.*') ? 'bg-gray-700 text-purple-400' : '' }}">
+                                Kontrak Penjualan
+                            </a>
+                            <a href="{{ route('sales_deliveries.index') }}"
+                                class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('buyers.*') ? 'bg-gray-700 text-purple-400' : '' }}">
+                                Pengiriman Penjualan
+                            </a>
+                            <a href="{{ route('sales_invoices.index') }}"
+                                class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('sales.*') ? 'bg-gray-700 text-purple-400' : '' }}">
+                                Invoice Penjualan
+                            </a>
+                            <a href="{{ route('sales_tax_invoices.index') }}"
+                                class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('buyers.*') ? 'bg-gray-700 text-purple-400' : '' }}">
+                                Faktur Pajak Penjualan
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
 
