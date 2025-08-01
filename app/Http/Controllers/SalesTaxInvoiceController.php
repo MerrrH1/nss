@@ -6,6 +6,7 @@ use App\Models\SalesTaxInvoice;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class SalesTaxInvoiceController extends Controller
 {
@@ -90,6 +91,33 @@ class SalesTaxInvoiceController extends Controller
             Log::error("Gagal memperbarui faktur pajak penjualan: {$e->getMessage()}", ['exception' => $e]);
             return back()->withInput()->with('error', 'Terjadi kesalahan saat memperbarui faktur pajak penjualan!');
         }
+    }
+
+    public function markAsPaid(Request $request, SalesTaxInvoice $salesTaxInvoice)
+    {
+        // Prevent marking as paid if it's already paid
+        if ($salesTaxInvoice->payment_status === 'paid') {
+            return redirect()->back()->with('error', 'Faktur Pajak ini sudah ditandai sebagai sudah dibayar sebelumnya.');
+        }
+
+        try {
+            $request->validate([
+                'payment_date' => ['required', 'date', 'before_or_equal:today'],
+            ], [
+                'payment_date.required' => 'Tanggal pembayaran wajib diisi.',
+                'payment_date.date' => 'Tanggal pembayaran harus berupa tanggal yang valid.',
+                'payment_date.before_or_equal' => 'Tanggal pembayaran tidak boleh di masa depan.',
+            ]);
+        } catch (ValidationException $e) {
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        }
+
+        // Update payment_date and payment_status
+        $salesTaxInvoice->payment_date = $request->input('payment_date');
+        $salesTaxInvoice->payment_status = 'paid'; // Explicitly set status to 'paid'
+        $salesTaxInvoice->save();
+
+        return redirect()->back()->with('success', 'Faktur Pajak berhasil ditandai sebagai sudah dibayar!');
     }
 
     /**

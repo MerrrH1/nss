@@ -140,7 +140,7 @@
                                 <input type="date" id="payment_date" name="payment_date" required
                                     class="block w-auto rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
                                     value="{{ old('payment_date', now()->format('Y-m-d')) }}">
-
+                                
                                 <button type="submit"
                                     class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                                     Tandai Sudah Dibayar
