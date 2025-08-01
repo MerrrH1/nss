@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Sales Deliveries') }}
+            {{ __('Sales Invoices') }}
         </h2>
     </x-slot>
 
@@ -23,7 +23,7 @@
                     @endif
 
                     <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg font-medium">Manajemen Pengiriman Penjualan</h3>
+                        <h3 class="text-lg font-medium">Manajemen Invoice Penjualan</h3>
                     </div>
 
                     {{-- Tabel Daftar Kontrak --}}
@@ -33,59 +33,53 @@
                                 <tr>
                                     <th scope="col"
                                         class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                        No. Kontrak</th>
+                                        No. Invoice</th>
                                     <th scope="col"
                                         class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                        Tujuan</th>
+                                        Pembeli</th>
                                     <th scope="col"
                                         class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
                                         Tanggal</th>
                                     <th scope="col"
                                         class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                        Netto Muat</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                        Netto Bongkar</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
                                         Total</th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                                        Tanggal Bayar</th>
                                     <th scope="col"
                                         class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
                                         Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                                @forelse ($salesDeliveries as $delivery)
+                                @forelse ($salesInvoices as $invoice)
                                     <tr>
                                         <td
                                             class="px-6 py-4 text-center whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-200">
-                                            <a href="{{ route('sales_contracts.show', $delivery->salesContract) }}"parameters: 
+                                            <a href="{{ route('sales_invoices.show', $invoice) }}"parameters: 
                                                 class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-600">
-                                                {{ $delivery->salesContract->contract_number }}
+                                                {{ $invoice->invoice_number }}
                                             </a>
                                         </td>
                                         <td
                                             class="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                                            {{ $delivery->salesContract->buyer->name }}</td>
+                                            {{ $invoice->salesContract->buyer->name }}</td>
                                         <td
                                             class="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                                            {{ $delivery->delivery_date->format('d M Y') }}</td>
+                                            {{ $invoice->invoice_date->format('d M Y') }}</td>
                                         <td
                                             class="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                                            {{ number_format($delivery->net_weight_kg, 0, ',', '.') }} Kg</td>
+                                            {{ 'Rp ' . number_format($invoice->salesContract->is_bonded_zone == 1 ? $invoice->sub_total : $invoice->sub_total + $invoice->tax_amount, 0, ',', '.') }}</td>
                                         <td
-                                            class="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                                            {{ number_format($delivery->final_net_weight_kg, 0, ',', '.') }} Kg</td>
-                                        <td
-                                            class="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                                            Rp {{ number_format($delivery->total_amount, 0, ',', '.') }}</td>
+                                            class="px-6 py-4 text-center whitespace-nowrap text-sm {{ $invoice->payment_date ? "text-gray-900 dark:text-gray-200" : "text-red-900 dark:text-red-200"}}">
+                                            {{ $invoice->payment_date ? $invoice->payment_date->format('d M Y') : "Belum Bayar" }}</td>
                                         <td
                                             class="px-6 py-4 text-center whitespace-nowrap text-right text-sm font-medium">
-                                            <a href="{{ route('sales_deliveries.show', $delivery->id) }}"
+                                            <a href="{{ route('sales_invoices.show', $invoice) }}"
                                                 class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-600 mr-3">Lihat</a>
-                                            {{-- <a href="{{ route('sales_deliveries.edit', $delivery->id) }}"
+                                            {{-- <a href="{{ route('sales_deliveries.edit', $invoice->id) }}"
                                                 class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-600 mr-3">Edit</a>
-                                            <form action="{{ route('sales_deliveries.destroy', $delivery->id) }}"
+                                            <form action="{{ route('sales_deliveries.destroy', $invoice->id) }}"
                                                 method="POST" class="inline-block"
                                                 onsubmit="return confirm('Apakah Anda yakin ingin menghapus kontrak ini?');">
                                                 @csrf
@@ -99,7 +93,7 @@
                                     <tr>
                                         <td colspan="10"
                                             class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
-                                            Tidak ada kontrak penjualan yang ditemukan.</td>
+                                            Tidak ada invoice penjualan yang ditemukan.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -108,7 +102,7 @@
 
                     {{-- Paginasi --}}
                     <div class="mt-4">
-                        {{ $salesDeliveries->links() }}
+                        {{ $salesInvoices->links() }}
                     </div>
 
                 </div>

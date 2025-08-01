@@ -32,6 +32,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/reject_sales_deliveries/{salesDelivery}', [SalesDeliveriesController::class, 'cancel'])->name('sales_deliveries.cancel');
     Route::resource('/sales_invoices', SalesInvoiceController::class);
     Route::get('/create_sales_invoice/{salesContract}', [SalesInvoiceController::class, 'createSalesInvoice'])->name('sales_invoices.create');
+    Route::patch('/sales_invoices/{salesInvoice}/mark-as-paid', [SalesInvoiceController::class, 'markAsPaid'])->name('sales_invoices.mark_as_paid');
     Route::resource('/sales_tax_invoices', SalesTaxInvoiceController::class);
     Route::resource('/purchase_contracts', PurchaseContractController::class);
 });

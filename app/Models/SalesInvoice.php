@@ -19,6 +19,7 @@ class SalesInvoice extends Model
         'total_amount',
         'payment_status',
         'payment_date',
+        'is_bonded_zone',
         'notes'
     ];
 

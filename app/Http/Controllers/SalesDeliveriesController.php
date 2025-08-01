@@ -19,7 +19,7 @@ class SalesDeliveriesController extends Controller
      */
     public function index()
     {
-        $salesDeliveries = SalesDeliveries::orderBy('delivery_date')->paginate(10);
+        $salesDeliveries = SalesDeliveries::orderBy('delivery_date', 'DESC')->paginate(20);
         return view('sales_deliveries.index', compact('salesDeliveries'));
     }
 

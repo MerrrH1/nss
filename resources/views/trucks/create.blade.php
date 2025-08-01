@@ -45,7 +45,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label for="plate_number"
-                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Truk</label>
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nomor Polisi</label>
                                     <input type="text" name="plate_number" id="plate_number" value="{{ old('plate_number') }}"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 @error('plate_number') border-red-500 @enderror">
                                     @error('plate_number')
@@ -63,7 +63,7 @@
                                 </div>
                                 <div>
                                     <label for="notes"
-                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Pengemudi</label>
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Catatan</label>
                                     <input type="text" name="notes" id="notes" value="{{ old('notes') }}"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 @error('notes') border-red-500 @enderror">
                                     @error('notes')

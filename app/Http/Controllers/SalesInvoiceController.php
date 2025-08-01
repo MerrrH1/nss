@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class SalesInvoiceController extends Controller
 {
@@ -20,7 +21,8 @@ class SalesInvoiceController extends Controller
      */
     public function index()
     {
-        $salesInvoices = SalesInvoice::orderBy('name')->paginate(10);
+        $salesInvoices = SalesInvoice::orderBy('payment_date')
+            ->orderBy('invoice_date', 'DESC')->paginate(10);
         return view('sales_invoices.index', compact('salesInvoices'));
     }
 
@@ -97,9 +99,9 @@ class SalesInvoiceController extends Controller
             // --- GENERATE INVOICE NUMBER ---
             // Logika untuk invoice_number: Anda bisa menggunakan paket seperti `spatie/laravel-sluggable` atau logika manual
             $latestInvoice = SalesInvoice::whereYear('created_at', date('Y'))
-                                         ->whereMonth('created_at', date('m'))
-                                         ->orderBy('id', 'desc')
-                                         ->first();
+                ->whereMonth('created_at', date('m'))
+                ->orderBy('id', 'desc')
+                ->first();
             $counter = $latestInvoice ? (int)substr($latestInvoice->invoice_number, -4) + 1 : 1;
             $invoiceNumber = 'INV-' . $salesContract->contract_number . '-' . date('Ym') . sprintf('%04d', $counter);
 
@@ -132,10 +134,10 @@ class SalesInvoiceController extends Controller
                 // Gunakan model singular: SalesDelivery
                 Log::info("Satu");
                 $selectedDeliveries = SalesDeliveries::whereIn('id', $validatedData['selected_deliveries'])
-                ->where('sales_contract_id', $salesContract->id)
-                ->where('status', 'completed')
-                ->whereDoesntHave('salesInvoices')
-                ->pluck('id');
+                    ->where('sales_contract_id', $salesContract->id)
+                    ->where('status', 'completed')
+                    ->whereDoesntHave('salesInvoices')
+                    ->pluck('id');
                 Log::info("Dua");
 
                 if ($selectedDeliveries->isEmpty()) {
@@ -203,6 +205,30 @@ class SalesInvoiceController extends Controller
             Log::error("Gagal memperbarui faktur penjualan: {$e->getMessage()}", ['exception' => $e]);
             return back()->withInput()->with('error', 'Terjadi kesalahan saat memperbarui faktur penjualan!');
         }
+    }
+
+    public function markAsPaid(Request $request, SalesInvoice $salesInvoice)
+    {
+        if ($salesInvoice->payment_date !== null) {
+            return redirect()->back()->with('error', 'Invoice ini sudah ditandai sebagai sudah dibayar sebelumnya.');
+        }
+
+        try {
+            $request->validate([
+                'payment_date' => ['required', 'date', 'before_or_equal:today'],
+            ], [
+                'payment_date.required' => 'Tanggal pembayaran wajib diisi.',
+                'payment_date.date' => 'Tanggal pembayaran harus berupa tanggal yang valid.',
+                'payment_date.before_or_equal' => 'Tanggal pembayaran tidak boleh di masa depan.',
+            ]);
+        } catch (ValidationException $e) {
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        }
+
+        $salesInvoice->payment_date = $request->input('payment_date');
+        $salesInvoice->save();
+
+        return redirect()->back()->with('success', 'Invoice berhasil ditandai sebagai sudah dibayar!');
     }
 
     /**
