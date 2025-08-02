@@ -10,6 +10,9 @@ use App\Http\Controllers\SalesInvoiceController;
 use App\Http\Controllers\SalesTaxInvoiceController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TruckController;
+use App\Models\PurchaseInvoice;
+use App\Models\PurchaseReceipt;
+use App\Models\PurchaseTaxInvoice;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
@@ -37,6 +40,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/sales_tax_invoices/{salesTaxInvoice}/mark-as-paid', [SalesTaxInvoiceController::class, 'markAsPaid'])
         ->name('tax_invoices.mark_as_paid');
     Route::resource('/purchase_contracts', PurchaseContractController::class);
+    Route::resource('/purchase_receipts', PurchaseReceipt::class);
+    Route::resource('/purchase_invoices', PurchaseInvoice::class);
+    Route::resource('/purchase_tax_invoices', PurchaseTaxInvoice::class);
 });
 
 require __DIR__ . '/auth.php';

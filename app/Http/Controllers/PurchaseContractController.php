@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Commodity;
 use App\Models\PurchaseContract;
+use App\Models\Supplier;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class PurchaseContractController extends Controller
 {
@@ -24,7 +27,9 @@ class PurchaseContractController extends Controller
      */
     public function create()
     {
-        return view('purchase_contracts.create');
+        $suppliers = Supplier::orderBy('name')->get();
+        $commodities = Commodity::orderBy('name')->get();
+        return view('purchase_contracts.create', compact('suppliers', 'commodities'));
     }
 
     /**
@@ -32,29 +37,40 @@ class PurchaseContractController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'supplier_id' => 'required|integer',
-            'contract_number' => 'required|string|max:255|unique:purchase_contracts,contract_number',
-            'contract_date' => 'required|date',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date',
-            'commodity_id' => 'required|integer',
-            'total_quantity_kg' => 'required|decimal',
-            'price_per_kg' => 'required|decimal',
-            'tolerated_kk_percentage' => 'nullable|decimal',
-            'tolerated_ka_percentage' => 'nullable|decimal',
-            'tolerated_ffa_percentage' => 'nullable|decimal',
-            'quantity_received_kg' => 'nullable|decimal',
-            'status' => 'nullable|enum:active,completed,canceled',
-            'notes' => 'nullable|string'
-        ]);
-
         try {
-            PurchaseContract::create($request->all());
-            return redirect()->route('purchase_contracts.index')->with('success', 'Kontrak pembelian berhasil ditambahkan!');
-        } catch (Exception $e) {
-            Log::error("Gagal menambahkan kontrak pembelian: {$e->getMessage()}", ['exception' => $e]);
-            return back()->withInput()->with('error', 'Terjadi kesalahan saat menambahkan kontrak pembelian!');
+            $validatedData = $request->validate([
+                'supplier_id' => ['required', 'exists:suppliers,id'],
+                'contract_number' => ['required', 'string', 'max:255', 'unique:purchaseContracts,contract_number'],
+                'contract_date' => ['required', 'date'],
+                'commodity_id' => ['required', 'exists:commodities,id'],
+                'total_quantity_kg' => ['required', 'numeric', 'min:0'],
+                'price_per_kg' => ['required', 'numeric', 'min:0'],
+                'tolerated_kk_percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
+                'tolerated_ka_percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
+                'tolerated_ffa_percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
+                'tolerated_dobi_percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
+                'notes' => ['nullable', 'string', 'max:1000'],
+            ], [
+                'supplier_id.required' => 'Pemasok wajib dipilih.',
+                'contract_number.required' => 'Nomor kontrak wajib diisi.',
+                'contract_number.unique' => 'Nomor kontrak ini sudah digunakan.',
+                'commodity_id.required' => 'Komoditas wajib dipilih.',
+                'total_quantity_kg.required' => 'Total Kuantitas (Kg) wajib diisi.',
+                'price_per_kg.required' => 'Harga Per Kg wajib diisi.',
+            ]);
+            $validatedData['quantity_received_kg'] = 0;
+            $validatedData['status'] = 'active';
+
+            PurchaseContract::create($validatedData);
+
+            return redirect()->route('purchase_contracts.index')->with('success', 'Kontrak Pembelian berhasil dibuat!');
+
+        } catch (ValidationException $e) {
+            Log::error($e);
+            return redirect()->back()->withErrors($e->validator->getMessageBag())->withInput();
+        } catch (\Exception $e) {
+            Log::error($e);
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan Kontrak Pembelian: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -63,7 +79,7 @@ class PurchaseContractController extends Controller
      */
     public function show(PurchaseContract $purchaseContract)
     {
-        return view('purchase_contracts.show', compact('purchase_contract'));
+        return view('purchase_contracts.show', compact('purchaseContract'));
     }
 
     /**
@@ -71,7 +87,9 @@ class PurchaseContractController extends Controller
      */
     public function edit(PurchaseContract $purchaseContract)
     {
-        return view('purchase_contracts.edit', compact('purchase_contract'));
+        $suppliers = Supplier::orderBy('name')->get();
+        $commodities = Commodity::orderBy('name')->get();
+        return view('purchase_contracts.edit', compact('purchaseContract', 'suppliers', 'commodities'));
     }
 
     /**
@@ -81,7 +99,7 @@ class PurchaseContractController extends Controller
     {
         $request->validate([
             'supplier_id' => 'required|integer',
-            'contract_number' => 'required|string|max:255|' . Rule::unique('purchase_contracts')->ignore($purchaseContract->id()),
+            'contract_number' => 'required|string|max:255|' . Rule::unique('purchaseContracts')->ignore($purchaseContract->id()),
             'contract_date' => 'required|date',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date',

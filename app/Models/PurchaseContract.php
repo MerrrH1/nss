@@ -11,7 +11,7 @@ class PurchaseContract extends Model
 
     protected $fillable = [
         'supplier_id',
-        'purchase_contract_id',
+        'contract_number',
         'contract_date',
         'commodity_id',
         'total_quantity_kg',

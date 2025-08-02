@@ -74,6 +74,35 @@
                         </div>
                     </div>
                 </div>
+                
+                <div x-data="{ open: false }" class="relative hidden sm:flex items-center sm:ms-10">
+                    <div @mouseenter="open = true" @mouseleave="open = false" class="relative">
+                        <button class="text-white px-4 py-2 hover:text-purple-400 focus:outline-none">
+                            Data Pembelian
+                        </button>
+
+                        <div x-show="open" @mouseenter="open = true" @mouseleave="open = false"
+                            class="absolute left-0 mt-1 w-40 bg-gray-800 text-white rounded-md shadow-lg z-50"
+                            x-transition>
+                            <a href="{{ route('purchase_contracts.index') }}"
+                                class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('purchase_contracts.*') ? 'bg-gray-700 text-purple-400' : '' }}">
+                                Kontrak Pembelian
+                            </a>
+                            <a href="{{ route('purchase_receipts.index') }}"
+                                class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('purchases_deliveries.*') ? 'bg-gray-700 text-purple-400' : '' }}">
+                                Pengiriman Pembelian
+                            </a>
+                            <a href="{{ route('purchase_invoices.index') }}"
+                                class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('purchase_invoices.*') ? 'bg-gray-700 text-purple-400' : '' }}">
+                                Invoice Pembelian
+                            </a>
+                            <a href="{{ route('purchase_tax_invoices.index') }}"
+                                class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('purchase_tax_invoices.*') ? 'bg-gray-700 text-purple-400' : '' }}">
+                                Faktur Pajak Pembelian
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Settings Dropdown -->
